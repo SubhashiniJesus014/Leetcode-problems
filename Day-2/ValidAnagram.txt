@@ -1,0 +1,70 @@
+242. Valid Anagram
+
+Given two strings s and t, 
+return true if t is an anagram of s, 
+and false otherwise.
+
+
+Example 1:
+
+Input: s = "anagram", t = "nagaram"
+
+Output: true
+
+Example 2:
+
+Input: s = "rat", t = "car"
+
+Output: false
+
+ 
+
+Constraints:
+
+1 <= s.length, t.length <= 5 * 104
+s and t consist of lowercase English letters.
+
+
+**Constraints Explaination**
+
+=> the characters length in each string is between 1 to 50000.
+=> we can get the possible solutions are O(n),0(n log n).
+=> we can solve this problem using a hashmap,sorting with linear comparision,frequency array.
+
+
+**Sorting with linear comparision code**
+
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        
+        int n1=s.length();
+        int n2=t.length();
+
+        if(n1!=n2){
+            return false;
+        }
+
+        char [] arr1=s.toCharArray();
+        char [] arr2=t.toCharArray();
+        Arrays.sort(arr1);
+        Arrays.sort(arr2);
+        
+        for(int i=0;i<n1;i++){
+            if(arr1[i]!=arr2[i]){
+                return false;
+            }
+        }
+     return true;
+    }
+}
+
+
+Time complexity - O(n log n)
+space complexity - O(n) 
+
+why space complexity is O(n) because we have used extra space of character arrays 
+for the sake of sorting.
+
+=> for the above problem we cannot go with two pointers because the strings are not sorted and we cannot move left and right position and 
+    we cannot take the decision based on the two pointers that cannot tell us that either it is anagram or not.Anagram
+=> And we also cannot consider the sliding window technique,binary search,backtracking,heap,priority queue such type of patterns.
