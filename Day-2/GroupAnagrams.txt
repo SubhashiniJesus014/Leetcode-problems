@@ -1,0 +1,69 @@
+49. Group Anagrams
+
+Given an array of strings strs, group the anagrams together.
+You can return the answer in any order.
+
+
+Example 1:
+
+Input: strs = ["eat","tea","tan","ate","nat","bat"]
+
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+Constraints:
+
+1 <= strs.length <= 104
+0 <= strs[i].length <= 100
+strs[i] consists of lowercase English letters.
+
+**constraints explaination**
+=> the string length can be minimum 1 and maximum 10^4. it means the array can have
+   10000 strings in it.
+=> each string can be of minimum 1 to 10^2 length of the string.
+=> so now we can use the hashmap for this problem where each string is taken and sorted now 
+   it is converted to a string and it can be taken as a key and we will add those strings as a values
+   if suppose key is already present or else now we can create new list and add those values to a particular key
+   and finally all those values which are in list and they are seperately added in a list and returned.
+
+
+**Hashmap + sorting code solution**
+
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+
+        int n=strs.length;
+
+        ArrayList<List<String>>list1=new ArrayList<>();
+        HashMap<String, List<String>>map=new HashMap<>();
+
+
+        for(int i=0;i<n;i++){
+           String s=strs[i];
+           char [] arr=s.toCharArray();
+           Arrays.sort(arr);
+           String key=new String(arr);
+           if(map.containsKey(key)){
+            List<String>list2=map.get(key);
+            list2.add(s);
+           }else{
+              ArrayList<String> list2 = new ArrayList<>();
+                list2.add(s);
+                map.put(key, list2);
+           }
+        }
+        
+        list1.addAll(map.values());
+        return list1;
+    }
+}
+
+time complexity - O(n * k log k)
+space complexity - O(n*k)
+
+=> why time complexity is O(n * k log k) because the for loop considers n strings in an array 
+   and inside the loop we are taking a k length string and it is getting sorted. 
+   so time complexity is taken as O(n*k log k)
+=> why space complexity is O(n*k) because the hashmap is taking extra space with keys and values
+   so there n strings and each string is of k different length. so the space complexity is taken as O(n*k).
+=> And for this problem we can use hashmap with sorting and we can also use the frequency map and we cannot go with other patterns.
+
