@@ -1,0 +1,56 @@
+217. Contains Duplicate
+
+Given an integer array nums, return true if any value appears at least twice in the array, 
+and return false if every element is distinct.
+
+Example 1:
+
+Input: nums = [1,2,3,1]
+Output: true
+Explanation:
+The element 1 occurs at the indices 0 and 3.
+
+
+Constraints:
+
+1 <= nums.length <= 105
+-109 <= nums[i] <= 109
+
+**Constraints Explaination** 
+=> the size of an array minimum it can have one element and maximum it can have 10^5 elements
+=> In array each element can be with in the limit of -10^9 to 10^9
+=> so we can int as a data type and if we consider the bruteforce approach it may lead to time limit exceeded
+   as the comparisions would goes to 10^10. so the bruteforce solution cannot be accepted.
+=> the possible solutions are O(n),O(nlogn)
+=> we can get the solution using 
+   sorting+two pointers
+   hashmap
+   hashset
+
+**sorting + two pointers solution**
+
+class Solution {
+    public boolean containsDuplicate(int[] nums) {
+       int n=nums.length;
+       Arrays.sort(nums);
+       int l=0;
+       
+       for(int r=1;r<n;r++){
+        if(nums[l]==nums[r]){
+            return true;
+        }
+        l++;
+       }
+       return false;
+    }
+}
+
+time complexity - O(n log n)
+space complexity - O(1)
+
+=> why time complexity is O(n log n) because here we are sorting.
+=> and for space we are not using any extra space here so O(1).
+=> we cannot go with the sliding window technique because for every subarray we should use a hashset inside 
+   for each window agian it would become more complex.
+=> we cannot go with the binary search because we cannot do anything by 
+   using middle element and we cannot leave the left part.
