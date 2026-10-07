@@ -1,0 +1,69 @@
+1. Two Sum :
+
+You are given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+
+Example 1:
+
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+Example 2:
+
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+
+Constraints:
+
+2 <= nums.length <= 104
+-109 <= nums[i] <= 109
+-109 <= target <= 109
+Only one valid answer exists.
+
+
+**Constraints Explaination**
+=> the size of the array can be from minimum size 2 to maximum size 10^4
+=> each element in the array can be with in the limit of -10^9 to 10^9
+=> so based on the contraints we can have int datatype be used and now by considering 
+   bruteforce we can have 10^8 comparisions it will be in the worst case but this is also accepted as a solution.
+=> so the possible solutions could be 0(n),O(logn)
+
+**Bruteforce Approach**
+=> for the bruteforce we will take two for loops and we will iterate as
+   target=nums[i]+nums[j]
+=> so now we can go with the hashmap solution where we can calculate need
+   need=target-nums[i]
+=> hashmap could give us the O(n) solution.
+
+**HashMap O(n) Solution**
+
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        int n=nums.length;
+        HashMap<Integer,Integer>map=new HashMap<>();
+        for(int i=0;i<n;i++){
+            int need=target-nums[i];
+            if(map.containsKey(need)){
+              return new int[]{map.get(need),i};
+            }
+            map.put(nums[i],i);
+        }
+     return new int[]{-1,-1};
+    }
+}
+
+Time complexity - O(n)
+space complexity - O(n)
+=> why time complexity is O(n) because we are using one for loop to iterate through each value.
+=> why space complexity is O(n) because we are using hashmap as a extra space for storing each element frequency.
+
+=> In the above solution why we took hashmap in the sense based upon the bruteforce solution
+   and we cannot go with the two pointers because the given array is not sorted and we cannot go with the 
+   sliding window technique because here we need to check the contigous subset of an array and we cannot go with the 
+   binary search also as it was not in the sorted order.
