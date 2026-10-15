@@ -1,0 +1,68 @@
+
+11. Container With Most Water
+
+You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).
+Find two lines that together with the x-axis form a container, such that the container contains the most water.
+Return the maximum amount of water a container can store.
+
+Input: height = [1,8,6,2,5,4,8,3,7]
+Output: 49
+Explanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7].
+In this case, the max area of water (blue section) the container can contain is 49.
+
+Constraints:
+
+n == height.length
+2 <= n <= 105
+0 <= height[i] <= 104
+
+**Constraints Explaination**
+
+=> the length of the array minimum is 2 and max is 10^5.
+=> the height of each vertical line min is 0 and max is 10^4.
+
+
+**two pointers code solution**
+
+class Solution {
+    public int maxArea(int[] height) {
+      int n=height.length;
+      int ans=0;
+      int l=0;
+      int r=n-1;
+      while(l<r){
+        int wd=r-l;
+        int ht=Math.min(height[l],height[r]);
+        ans=Math.max(ans,wd*ht);
+        if(height[l]<=height[r]){
+            l++;
+        }else{
+            r--;
+        }
+      }
+      return ans;
+    }
+}
+
+Time complexity - O(N)
+space complexity - O(1)
+
+=> the above code if we do using the bruteforce solution the approach looks in this way
+class Solution {
+    public int maxArea(int[] height) {
+      int n=height.length;
+      int ans=0;
+      for(int i=0;i<n;i++){
+      for(int j=i+1;j<n;j++){
+        int wd=j-i;
+        int ht=Math.min(height[i],height[j]);
+        ans=Math.max(ans,ht*wd);
+      }
+      }
+      return ans;
+    }
+}
+=> above one will take more complexity
+=> the optimized solution is done through two pointers technique where we just need to move the left and right pointers
+   and we cannot go with other patterns.
+
