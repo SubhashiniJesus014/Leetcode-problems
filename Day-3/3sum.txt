@@ -1,0 +1,83 @@
+
+15. 3Sum
+
+Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+Notice that the solution set must not contain duplicate triplets.
+
+Example 1:
+
+Input: nums = [-1,0,1,2,-1,-4]
+Output: [[-1,-1,2],[-1,0,1]]
+Explanation: 
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+The distinct triplets are [-1,0,1] and [-1,-1,2].
+Notice that the order of the output and the order of the triplets does not matter.
+Example 2:
+
+Input: nums = [0,1,1]
+Output: []
+Explanation: The only possible triplet does not sum up to 0.
+
+Constraints:
+
+3 <= nums.length <= 3000
+-105 <= nums[i] <= 105
+
+constraints explaination :
+=> length of the array could be minimum 3 to maximum 3000 length.
+=> each element in the array minimum would be -10^5 to max 10^5.
+
+Bruteforce approach
+=> If I just go with the bruteforce approach the solution will take more time and it will be more complex solution
+   where it takes 0(n^3)
+
+Optimized solution using two pointers approach -
+
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        int n=nums.length;
+        List<List<Integer>>nlist=new ArrayList<>();
+        Arrays.sort(nums);
+        for(int i=0;i<n-2;i++){
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+            int l=i+1;
+            int r=n-1;
+            while(l<r){
+            int sum=nums[i]+nums[l]+nums[r];
+            List<Integer>list=new ArrayList<>();
+            if(sum==0){
+               list.add(nums[i]);
+               list.add(nums[l]);
+               list.add(nums[r]);
+               nlist.add(list);
+               l++;
+               r--;
+               while(l<r && nums[l]==nums[l-1]){
+                l++;
+               }
+               while(l<r && nums[r]==nums[r+1]){
+                r--;
+               }
+            }else if(sum<0){
+                l++;
+            }else if(sum>0){
+                r--;
+            }
+            }
+            }
+     return nlist;
+    }
+}
+
+Tc - O(n^2)
+sc - O(k) because the list is storing three elements in such a way we will be having k triplets
+     so it can be written as O(3k) space is occupied in the solution.
+
+=> for the above problem we took the two pointers approach through O(n^2) solution where we can get the 
+   more optimized solution.
+=> we cannot go with the sliding window technique of fixed size because here we should not check the elements in a contigous manner. 
+   here we have to check the all combinations of the 3 elements so through sliding window technique it will goes in a continous manner and we cannot 
+   get all the combinations of the triplets. And we cannot do using binary serach,monotonic stack,queues,dp and some other patterns.
