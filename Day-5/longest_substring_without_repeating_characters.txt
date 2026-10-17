@@ -1,0 +1,72 @@
+
+3. Longest Substring Without Repeating Characters
+Given a string s, find the length of the longest substring without duplicate characters.
+
+Example 1:
+
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3. 
+Note that "bca" and "cab" are also correct answers.
+
+Constraints:
+
+0 <= s.length <= 105
+s consists of English letters, digits, symbols and spaces.
+
+***constraints explaination***
+=> string length could be min 0 and max 10^5.
+
+****brute force solution****
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int n=s.length();
+        int maxlen=0;
+        for(int i=0;i<n;i++){
+            // String str="";
+            HashSet<Character>set=new HashSet<>();
+            set.add(s.charAt(i));
+        for(int j=i+1;j<n;j++){
+            if(!set.contains(s.charAt(j))){
+                set.add(s.charAt(j));
+                // maxlen=set.size();
+            }else{
+                break;
+            }
+        }
+         maxlen = Math.max(maxlen, set.size());
+        }
+     return maxlen;
+    }
+}
+
+=> the above approach takes O(n^2) solution and it check for all of the combinations of strings and it will take lot of time.
+=> space complexity is O(k)
+
+***sliding window technique approach***
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int n=s.length();
+        int maxlen=0;
+        int l=0;
+        String word="";
+        // word+=s.charAt(l);
+        for(int r=0;r<n;r++){
+            char c=s.charAt(r);
+            while (word.contains(String.valueOf(c))) {
+                word = word.substring(1);
+                l++;
+            }
+            word+=c;
+            maxlen=Math.max(maxlen,word.length());
+        }
+        return maxlen;
+    }
+}
+
+=>the above solution is done through the O(n) complexity and it takes less time where it 
+  is known as optimized solution.
+=>the space complexity is O(k) where the word can store k characters in worst case 
+  it can store n characters.
+=> as we need to check the continious longest substring without repeating so going with the 
+   sliding window technique is better.
