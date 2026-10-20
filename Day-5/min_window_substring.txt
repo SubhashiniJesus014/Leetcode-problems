@@ -1,0 +1,141 @@
+76. Minimum Window Substring
+Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. 
+If there is no such substring, return the empty string "".
+The testcases will be generated such that the answer is unique.
+
+Example 1:
+
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+Example 2:
+
+Input: s = "a", t = "a"
+Output: "a"
+Explanation: The entire string s is the minimum window.
+Example 3:
+
+Input: s = "a", t = "aa"
+Output: ""
+Explanation: Both 'a's from t must be included in the window.
+Since the largest window of s only has one 'a', return empty string.
+
+Constraints:
+
+m == s.length
+n == t.length
+1 <= m, n <= 105
+s and t consist of uppercase and lowercase English letters.
+
+=> the above code will be having two strings we need to return the minimum window substring where all letters of the other string should be present in the string s
+=> the bruteforce approach of the solution is here we will take all the combinations of the string and will check for the each string and there we will find the 
+   minimum window length and minimum word.
+
+Bruteforce code
+
+class Solution {
+    public boolean checkwords(String word,String t){
+      int[] count = new int[128];
+
+    for (int i = 0; i < word.length(); i++) {
+        count[word.charAt(i)]++;
+    }
+
+    for (int i = 0; i < t.length(); i++) {
+        if (count[t.charAt(i)] == 0) {
+            return false;
+        }
+        count[t.charAt(i)]--;
+    }
+
+    return true;
+    }
+    public String minWindow(String s, String t) {
+        int n=s.length();
+        int minlen=Integer.MAX_VALUE;
+        String minword="";
+        int l=0;
+        String word="";
+         for(int r=0;r<n;r++){
+            word+=s.charAt(r);
+          while(checkwords(word,t)){
+           if(word.length()<minlen){
+            minlen=word.length();
+            minword=word;
+           }
+            word = word.substring(1);
+            l++;
+          }
+         }
+     return minword;
+    }
+}
+
+sliding window technique code
+
+class Solution {
+   
+     public boolean contains(int[] mapS, int[] mapT) {
+        for (int i = 0; i < 256; i++) {
+            if (mapS[i] < mapT[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public String minWindow(String s, String t) {
+          if (t.length() == 0 || s.length() < t.length()) {
+            return "";
+        }
+
+        int[] mapS = new int[256];
+        int[] mapT = new int[256];
+
+        for (char ch : t.toCharArray()) {
+            mapT[ch]++;
+        }
+
+        int left = 0;
+        int minLen = Integer.MAX_VALUE;
+        int minStart = 0;
+
+        for (int right = 0; right < s.length(); right++) {
+            mapS[s.charAt(right)]++;
+
+            while (contains(mapS, mapT)) {
+                if (right - left + 1 < minLen) {
+                    minLen = right - left + 1;
+                    minStart = left;
+                }
+
+                mapS[s.charAt(left)]--;
+                left++;
+            }
+        }
+
+        return minLen == Integer.MAX_VALUE
+                ? ""
+                : s.substring(minStart, minStart + minLen);
+    }
+}
+tc = O(n)
+sc = O(1)
+
+The space complexity depends on whether the extra memory grows with the input size.
+Code	Space complexity	Why?
+int[] arr = new int[256];	\(O(1)\)	Fixed size
+int[] arr = new int[128];	\(O(1)\)	Fixed size
+int[] arr = new int[n];	\(O(n)\)	Size grows with input
+int[] arr = new int[s.length()];	\(O(n)\)	Size depends on s
+int[] arr = new int[n * n];	\(O(n^2)\)	Size grows quadratically
+
+Remember this interview trick
+- Fixed memory → \(O(1)\)
+- Memory proportional to input size → \(O(n)\)
+- Memory proportional to the square of input size → \(O(n^2)\)
+
+=> we can do this code using sliding window technique where we will move the left and right pointer if we find a string where a string contains all the characters of the 
+   t word then we will shrink from left side and we will store the minimum length word and then we will start from increasing the right and finally we will get the minimum window substring.
+
+
