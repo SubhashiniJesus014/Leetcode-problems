@@ -1,0 +1,60 @@
+
+The top 50 product-based companies hiring for SDE 1 / entry-level 
+software engineering roles in India are grouped below by category:
+
+1. Global Big Tech & Tier-1 GiantsGoogle (Bangalore, Hyderabad)  
+ Microsoft (Bangalore, Hyderabad, Noida)  
+ Amazon (Bangalore, Hyderabad, Chennai, Pune, Delhi NCR)  
+ Apple (Bangalore, Hyderabad)   Meta (Bangalore, Gurgaon)  
+ Adobe (Bangalore, Noida)   Salesforce (Bangalore, Hyderabad, Pune)   
+ Oracle (Bangalore, Hyderabad, Pune, Noida)   SAP Labs (Bangalore, Gurgaon, Pune)   
+ Cisco (Bangalore)   
+2. High-Growth Tech & Enterprise PlatformsAtlassian (Bangalore, Remote)  
+   Uber (Bangalore, Hyderabad)  
+   LinkedIn (Bangalore)  
+   Intuit (Bangalore)
+   PayPal (Bangalore, Chennai)
+   Stripe (Bangalore, Remote)   
+   Twilio (Bangalore, Remote)Nutanix (Bangalore, Pune)   
+   Rubrik (Bangalore)   
+   ServiceNow (Hyderabad, Bangalore)
+   VMware by Broadcom (Bangalore, Pune)
+   Zscaler (Bangalore, Hyderabad, Chandigarh)
+   Palo Alto Networks (Bangalore)   
+   Snowflake (Pune, Bangalore)
+   Coinbase (Remote / Bangalore)
+3. Retail Tech & Consumer Platforms
+  Walmart Global Tech (Bangalore, Chennai)
+  Target Tech (Bangalore)   
+  Flipkart (Bangalore)
+  Myntra (Bangalore)
+  Meesho (Bangalore)
+  Zepto (Bangalore, Mumbai)  
+  Blinkit (Gurgaon)   
+  Swiggy (Bangalore, Remote)
+  Zomato (Gurgaon)Ola (Bangalore)
+4. Fintech & PaymentsPhonePe (Bangalore, Pune)   
+   Razorpay (Bangalore)   
+   CRED (Bangalore)   
+   Groww (Bangalore)   
+   Zerodha (Bangalore)
+   Juspay (Bangalore)
+   Slice (Bangalore)
+   Paytm / One97 (Noida, Bangalore)   
+5. Developer Tools, SaaS & Media Tech
+   Postman (Bangalore, Remote)   
+   BrowserStack (Mumbai, Bangalore, Remote)
+   Freshworks (Chennai, Bangalore)
+   Zoho (Chennai, Tenkasi)
+   InMobi (Bangalore)   J
+   ioCinema / Viacom18 (Bangalore, Mumbai)
+   Disney+ Hotstar (Bangalore, Mumbai)
+Key Application Strategies for SDE 1 RolesDSA & Problem Solving: 
+Most companies require 1–2 online assessments followed by 2–3 technical rounds 
+focusing on arrays, two pointers, hashing, trees, graphs, and dynamic programming.   
+
+Machine Coding / Low-Level Design (LLD): Indian unicorns (Flipkart, Swiggy, Razorpay, PhonePe, CRED) frequently include an LLD or machine coding round requiring clean OOP design, 
+design patterns, and running code within 90 minutes.  
+
+Referrals Over Direct Portals: Cold applications on portals receive thousands of submissions;
+targeting engineering connections on LinkedIn for internal job IDs significantly improves callback rates.
