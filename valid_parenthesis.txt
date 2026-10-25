@@ -1,0 +1,76 @@
+20. Valid Parentheses
+Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+An input string is valid if:
+Open brackets must be closed by the same type of brackets.
+Open brackets must be closed in the correct order.
+Every close bracket has a corresponding open bracket of the same type.
+
+Example 1:
+Input: s = "()"
+Output: true
+Example 2:
+Input: s = "()[]{}"
+Output: true
+Example 3:
+Input: s = "(]"
+Output: false
+Example 4:
+Input: s = "([])"
+Output: true
+
+Constraints:
+1 <= s.length <= 104
+s consists of parentheses only '()[]{}'.
+
+--->constraints are the string length it starts from minimum and maximum is 10^4.
+--->it consists of parenthesis only here we need to check for every open bracket there is a closed bracket or not and it should be properly organised.
+
+---- bruteforce approach code ----
+class Solution {
+    public boolean isValid(String s) {
+        // Stack<Character>st=new Stack<>();
+        while (s.contains("()") ||
+       s.contains("{}") ||
+       s.contains("[]")) {
+
+    s = s.replace("()", "");
+    s = s.replace("{}", "");
+    s = s.replace("[]", "");
+    }
+    return s.isEmpty();
+    }
+}
+
+---- stack solution ----
+  class Solution {
+    public boolean isValid(String s) {
+        // Stack<Character>st=new Stack<>();
+       Stack<Character>st=new Stack<>();
+       for(int i=0;i<s.length();i++){
+        if(s.charAt(i)=='(' || s.charAt(i)=='{' || s.charAt(i)=='['){
+            st.push(s.charAt(i));
+        }else{
+            if(st.isEmpty()){
+                return false;
+            }
+            char top=st.peek();
+            if(s.charAt(i)==')' && top=='(' ||
+               s.charAt(i)=='}' && top=='{' ||
+               s.charAt(i)==']' && top=='['){
+                st.pop();
+               }else{
+                return false;
+               }
+        }
+       }
+       return st.isEmpty();
+    }
+}
+  ---->the above solution is done with O(n) time complexity and space complexity is O(n)
+  ---->One stack operation push() or pop() - (O(1)
+Constant time for one operation.
+---->Entire algorithm
+Process all \(n\) characters.(O(n))
+Linear time because the loop processes every character at most once.
+
+
