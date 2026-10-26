@@ -1,0 +1,651 @@
+DSA STRING COMPLETE NOTES FOR PRODUCT-BASED COMPANY INTERVIEWS
+Language focus: Java
+Includes String fundamentals, built-in methods, StringBuilder, patterns, complexity,
+common interview problems, pitfalls, and a prioritized practice checklist.
+
+============================================================
+1. WHAT IS A STRING IN JAVA?
+============================================================
+
+A String is a sequence of characters. In Java, String is an object and is IMMUTABLE:
+once a String object is created, its contents cannot be changed.
+
+    String s = "hello";
+    char c = s.charAt(1); // 'e'
+    int n = s.length();   // 5
+
+When you write:
+    s = s + "!";
+Java creates a new String for the combined result and assigns the reference to s.
+The original String object is not modified.
+
+String literals can be stored in the String pool:
+    String a = "java";
+    String b = "java";
+    // a and b commonly refer to the same pooled literal object
+
+But:
+    String c = new String("java");
+    // c may refer to a distinct String object
+
+Compare string CONTENTS using equals(), not ==:
+    a.equals(b) // true
+    a == b      // reference comparison; do not use for content equality
+
+============================================================
+2. STRING CREATION AND INPUT
+============================================================
+
+    String a = "hello";
+    String b = new String("hello");
+    char[] chars = {'c', 'o', 'd', 'e'};
+    String c = new String(chars);
+
+Scanner input:
+    Scanner sc = new Scanner(System.in);
+    String word = sc.next();       // reads one token
+    sc.nextLine();                 // may consume the rest of a line
+    String line = sc.nextLine();   // reads a full line, including spaces
+
+Common Scanner pitfall:
+After nextInt() or next(), a newline may remain. Calling nextLine() immediately can
+return the remainder of that same line (often an empty string). Consume the newline
+when appropriate before reading the next full line.
+
+============================================================
+3. IMPORTANT STRING PROPERTIES
+============================================================
+
+- String length is fixed; use s.length(), not s.length.
+- String indexing starts at 0.
+- Last valid character index is s.length() - 1.
+- s.charAt(i) throws StringIndexOutOfBoundsException if i is invalid.
+- Strings are immutable.
+- Java char is a UTF-16 code unit, not necessarily a full Unicode character.
+  For common interview problems using English letters, char-based solutions are typical.
+  For full Unicode code points, use codePoints() or code-point-aware APIs.
+
+============================================================
+4. CORE STRING METHODS
+============================================================
+
+Assume:
+    String s = "Hello World";
+
+A. length()
+    s.length()              // 11
+
+B. charAt(index)
+    s.charAt(0)             // 'H'
+
+C. substring(beginIndex)
+    s.substring(6)          // "World"
+
+D. substring(beginIndex, endIndex)
+    s.substring(0, 5)       // "Hello"
+Range is begin-inclusive and end-exclusive.
+Length of the result is endIndex - beginIndex.
+
+E. equals(other)
+    "java".equals("java")   // true
+Case-sensitive content comparison.
+
+F. equalsIgnoreCase(other)
+    "Java".equalsIgnoreCase("java") // true
+Use when case-insensitive comparison is required; exact Unicode case-folding rules
+can be more nuanced than simple ASCII comparisons.
+
+G. compareTo(other)
+Lexicographic, case-sensitive comparison.
+- 0 means equal.
+- Negative means this string comes before the other.
+- Positive means this string comes after the other.
+Do not assume the result is always exactly -1 or 1.
+
+H. compareToIgnoreCase(other)
+Lexicographic comparison ignoring case in a case-insensitive manner.
+
+I. contains(sequence)
+    s.contains("World")     // true
+
+J. startsWith(prefix)
+    s.startsWith("Hello")   // true
+
+K. endsWith(suffix)
+    s.endsWith("World")     // true
+
+L. indexOf(value)
+    s.indexOf('o')           // first matching index
+    s.indexOf("World")       // first occurrence of substring
+Returns -1 when not found.
+Overloads can accept a starting index.
+
+M. lastIndexOf(value)
+Returns the last occurrence index, or -1 if not found.
+
+N. toLowerCase() / toUpperCase()
+    "Java".toLowerCase()    // "java"
+    "Java".toUpperCase()    // "JAVA"
+For locale-independent identifiers, consider Locale.ROOT:
+    s.toLowerCase(Locale.ROOT)
+
+O. trim()
+Removes leading/trailing characters considered <= U+0020.
+It does not remove spaces inside the string.
+For broader Unicode whitespace handling, strip() is available in Java 11+.
+
+P. strip(), stripLeading(), stripTrailing() (Java 11+)
+Remove leading/trailing Unicode whitespace according to String's whitespace rules.
+
+Q. isEmpty()
+True only when length is 0.
+    "".isEmpty()  // true
+    " ".isEmpty() // false
+
+R. isBlank() (Java 11+)
+True if empty or contains only whitespace characters recognized by this method.
+    "   ".isBlank() // true
+
+S. replace(oldChar, newChar)
+    "banana".replace('a', 'o') // "bonono"
+
+T. replace(target, replacement)
+Replaces literal matching character sequences:
+    "a-b-a".replace("-", "_") // "a_b_a"
+
+U. replaceAll(regex, replacement)
+Uses a regular expression:
+    "a1b2".replaceAll("\\d", "") // "ab"
+Regex characters need escaping correctly in Java strings.
+For literal replacement, prefer replace() when a regex is not needed.
+
+V. replaceFirst(regex, replacement)
+Replaces the first regex match.
+
+W. split(regex)
+Splits by a regular expression:
+    "red,blue,green".split(",")
+Be careful: split() takes a regex, not a plain delimiter in every case.
+To split on a literal dot, use "\\.".
+The default split drops trailing empty strings; use split(regex, -1) to preserve them.
+
+X. concat(other)
+    "Hello ".concat("Java") // "Hello Java"
+The + operator is often simpler.
+
+Y. repeat(count) (Java 11+)
+    "ha".repeat(3) // "hahaha"
+
+Z. toCharArray()
+    char[] arr = s.toCharArray()
+Creates a new character array.
+
+AA. getBytes()
+Converts the string to bytes using a charset. Prefer explicit charset for stable results:
+    s.getBytes(StandardCharsets.UTF_8)
+
+AB. matches(regex)
+Returns true only if the ENTIRE string matches the regex.
+    "123".matches("\\d+") // true
+
+AC. regionMatches(...)
+Compares portions of strings; less common in DSA.
+
+AD. String.join(delimiter, elements)
+    String joined = String.join("-", "a", "b", "c"); // "a-b-c"
+
+AE. String.valueOf(value)
+Converts a primitive/object value to a String.
+    String.valueOf(123) // "123"
+
+AF. String.format(...)
+Formats a string. Useful in applications; rarely necessary for core DSA.
+
+AG. String.intern()
+Returns the canonical pooled representation. Usually not needed in DSA interviews.
+
+AH. lines() (Java 11+)
+Returns a stream of lines separated by line terminators.
+
+AI. chars() / codePoints()
+Provide streams of UTF-16 code units / Unicode code points.
+
+============================================================
+5. STRING IMMUTABILITY: IMPORTANT INTERVIEW TOPIC
+============================================================
+
+    String s = "cat";
+    s.concat("s");
+    System.out.println(s); // cat
+
+concat() returns a new String; it does not modify s.
+Correct:
+    s = s.concat("s");
+
+Repeated concatenation in a loop can be inefficient because many intermediate String
+objects may be created. Use StringBuilder when repeatedly appending or modifying text.
+
+============================================================
+6. STRINGBUILDER AND STRINGBUFFER
+============================================================
+
+StringBuilder:
+- Mutable character sequence.
+- Efficient for repeated append, insert, delete, and reverse operations.
+- Not synchronized; usually preferred for single-threaded DSA work.
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("hello");
+    sb.append(' ');
+    sb.append("java");
+    System.out.println(sb.toString());
+
+Useful StringBuilder methods:
+- length()
+- capacity()
+- charAt(index)
+- setCharAt(index, ch)
+- append(value)
+- insert(index, value)
+- delete(start, end)        // end-exclusive
+- deleteCharAt(index)
+- replace(start, end, str)  // end-exclusive
+- reverse()
+- substring(start)
+- substring(start, end)
+- setLength(newLength)
+- toString()
+- ensureCapacity(minCapacity)
+
+Example reverse:
+    String reversed = new StringBuilder("hello").reverse().toString();
+
+StringBuffer:
+- Similar mutable API, but synchronized for thread safety.
+- Often slower than StringBuilder in single-threaded use.
+- Rarely needed for coding interview solutions.
+
+StringBuilder vs String:
+- String is immutable.
+- StringBuilder is mutable.
+- For repeated concatenation in loops, StringBuilder is usually the better choice.
+
+============================================================
+7. CHARACTER ARRAYS AND FREQUENCY COUNTING
+============================================================
+
+For lowercase English letters:
+    int[] freq = new int[26];
+    for (char c : s.toCharArray()) {
+        freq[c - 'a']++;
+    }
+
+This assumes every character is between 'a' and 'z'. Validate or adapt for other inputs.
+
+For uppercase English letters:
+    freq[c - 'A']++;
+
+For arbitrary characters, consider:
+    Map<Character, Integer> freq = new HashMap<>();
+    for (char c : s.toCharArray()) {
+        freq.put(c, freq.getOrDefault(c, 0) + 1);
+    }
+
+Frequency counting is useful for:
+- Valid Anagram
+- First Unique Character
+- Ransom Note
+- Character replacement windows
+- Counting distinct characters
+
+============================================================
+8. TWO POINTERS ON STRINGS
+============================================================
+
+Useful for palindrome checks, reversing, and comparing from both ends.
+
+Palindrome check:
+    int left = 0, right = s.length() - 1;
+    while (left < right) {
+        if (s.charAt(left) != s.charAt(right)) return false;
+        left++;
+        right--;
+    }
+    return true;
+
+For "valid palindrome" problems that ignore punctuation/case:
+- Move left over non-alphanumeric characters.
+- Move right over non-alphanumeric characters.
+- Compare lowercased characters.
+- Move both pointers inward.
+
+Do not create reversed strings unnecessarily if a two-pointer check is sufficient.
+
+============================================================
+9. SLIDING WINDOW FOR STRINGS
+============================================================
+
+Useful for contiguous substrings with conditions such as:
+- No repeated characters.
+- At most K distinct characters.
+- Minimum substring containing required characters.
+- Character replacement under a change budget.
+
+General idea:
+1. Expand right to include a character.
+2. Update frequency/state.
+3. While the window violates the condition, shrink from the left.
+4. Update the best answer when the window is valid.
+
+Longest substring without repeating characters:
+- Use a HashMap from character to last seen index, or an array for a limited alphabet.
+- Move left forward when a repeated character occurs inside the current window.
+- Keep left monotonic: left = max(left, lastSeen + 1).
+- Update best length with right - left + 1.
+
+Time: O(n) average with HashMap.
+Space: O(min(n, character-set size)).
+
+Minimum Window Substring:
+- Count required characters.
+- Expand right until the window contains all required frequencies.
+- Shrink left while it remains valid, recording the smallest valid window.
+- Be careful with duplicate required characters.
+
+============================================================
+10. ANAGRAM PATTERN
+============================================================
+
+Two strings are anagrams if they contain the same characters with the same frequencies,
+assuming the same character model/case rules.
+
+Method 1: sort character arrays.
+    char[] a = s.toCharArray();
+    char[] b = t.toCharArray();
+    Arrays.sort(a);
+    Arrays.sort(b);
+    return Arrays.equals(a, b);
+
+Time: O(n log n), extra space depends on sorting/copies.
+
+Method 2: frequency counting.
+For lowercase English letters, count each character in one string and subtract counts
+for the other. If all counts are zero, they are anagrams.
+Time: O(n), extra space O(1) for fixed 26 letters.
+
+Common problems:
+- Valid Anagram
+- Group Anagrams
+- Find All Anagrams in a String
+- Permutation in String
+
+============================================================
+11. STRING REVERSAL AND WORD OPERATIONS
+============================================================
+
+Reverse entire string:
+    String reversed = new StringBuilder(s).reverse().toString();
+
+Reverse words:
+- Trim/strip outer whitespace as required.
+- Split into words.
+- Traverse words in reverse order and join with one space.
+- Be precise about multiple spaces and expected output.
+
+For a space delimiter:
+    String[] words = s.trim().split("\\s+");
+This handles runs of whitespace for many ordinary cases, but exact Unicode whitespace
+requirements may need more deliberate handling.
+
+Other patterns:
+- Reverse each word but preserve word order.
+- Reverse word order but preserve each word.
+- In-place character-array reversal when allowed.
+
+============================================================
+12. PALINDROME PROBLEMS
+============================================================
+
+Basic palindrome:
+Compare s[left] and s[right] while left < right.
+
+Valid Palindrome:
+Ignore punctuation and case if the problem specifies it.
+
+Valid Palindrome II:
+Can remove at most one character. On the first mismatch, check whether either
+substring [left+1, right] or [left, right-1] is a palindrome.
+
+Longest Palindromic Substring:
+Expand around each center:
+- Odd center: one character.
+- Even center: gap between two characters.
+Time O(n^2), extra space O(1) excluding result.
+
+Palindromic Substrings:
+Expand around every center and count all palindromes.
+Time O(n^2), extra space O(1).
+
+Manacher's algorithm solves longest palindromic substring in O(n) time, but is an
+advanced stretch topic.
+
+============================================================
+13. STACK-BASED STRING PROBLEMS
+============================================================
+
+Use a stack or StringBuilder when characters must be removed based on prior characters.
+
+Examples:
+- Valid Parentheses: stack of opening brackets.
+- Remove All Adjacent Duplicates in String: push characters; remove matching adjacent pair.
+- Decode String: stacks for repeat counts and prior string states.
+- Simplify Path: stack of directory names.
+- Remove Duplicate Letters: monotonic stack plus last-occurrence tracking.
+- Backspace String Compare: stack solution or two-pointer solution from the end.
+
+============================================================
+14. STRING MATCHING: BASIC AND ADVANCED
+============================================================
+
+Naive substring search:
+Check every possible starting position.
+Worst-case time O(n*m), where n is text length and m is pattern length.
+
+Built-in:
+    text.contains(pattern)
+    text.indexOf(pattern)
+These are convenient, but interviews may ask you to implement the search.
+
+KMP (Knuth-Morris-Pratt):
+- Precompute the LPS (longest proper prefix that is also suffix) array for the pattern.
+- When characters mismatch, use LPS to avoid rechecking matched text characters.
+- Time O(n + m), space O(m).
+
+Rabin-Karp:
+- Uses a rolling hash to compare substring hashes.
+- Average/expected performance can be efficient, but hash collisions require verification.
+- Useful for multiple pattern searches and substring hashing concepts.
+
+Z algorithm:
+- Computes Z values indicating the longest substring starting at each position that
+  matches the prefix.
+- Can solve pattern matching in O(n + m).
+
+Know the basics of KMP for stronger product-company preparation; advanced algorithms depend
+on target role and interview difficulty.
+
+============================================================
+15. COMMON STRING INTERVIEW PROBLEMS CHECKLIST
+============================================================
+
+FUNDAMENTALS
+[ ] Reverse String
+[ ] Valid Palindrome
+[ ] Valid Palindrome II
+[ ] Longest Common Prefix
+[ ] Find the Index of the First Occurrence in a String
+[ ] Implement strStr / substring search
+[ ] Roman to Integer
+[ ] Integer to Roman
+[ ] String to Integer (atoi)
+[ ] Add Strings
+
+FREQUENCY / ANAGRAM
+[ ] Valid Anagram
+[ ] Group Anagrams
+[ ] First Unique Character in a String
+[ ] Ransom Note
+[ ] Find All Anagrams in a String
+[ ] Permutation in String
+
+TWO POINTERS / SLIDING WINDOW
+[ ] Longest Substring Without Repeating Characters
+[ ] Minimum Window Substring
+[ ] Longest Repeating Character Replacement
+[ ] Backspace String Compare
+[ ] Repeated DNA Sequences (stretch)
+
+PALINDROMES
+[ ] Longest Palindromic Substring
+[ ] Palindromic Substrings
+[ ] Shortest Palindrome (advanced)
+
+STACK / PARSING
+[ ] Valid Parentheses
+[ ] Remove All Adjacent Duplicates in String
+[ ] Decode String
+[ ] Simplify Path
+[ ] Remove Duplicate Letters
+[ ] Basic Calculator
+[ ] Basic Calculator II
+
+STRING MATCHING / ADVANCED
+[ ] KMP / LPS array
+[ ] Rabin-Karp
+[ ] Z algorithm
+[ ] Word Break (DP)
+[ ] Edit Distance (DP)
+[ ] Longest Common Subsequence (DP)
+[ ] Distinct Subsequences (advanced DP)
+
+The exact questions vary by company. This list covers common patterns, not a guarantee
+that every company will ask these problems.
+
+============================================================
+16. COMMON JAVA STRING MISTAKES
+============================================================
+
+1. Comparing contents with == instead of equals().
+2. Assuming Strings can be changed in place.
+3. Using s.length instead of s.length().
+4. Calling charAt(s.length()) instead of charAt(s.length() - 1).
+5. Forgetting substring end index is exclusive.
+6. Using split(".") when a literal dot is intended; "." is a regex wildcard.
+   Use split("\\.") for a literal dot.
+7. Forgetting split() drops trailing empty tokens by default.
+8. Using replaceAll() when literal replace() is simpler.
+9. Forgetting that matches() requires the entire string to match.
+10. Using repeated + concatenation in a large loop instead of StringBuilder.
+11. Assuming lowercase-only frequency arrays handle uppercase, punctuation, or Unicode.
+12. Forgetting case sensitivity in equality, anagrams, and palindrome problems.
+13. Mishandling duplicate characters in sliding-window counts.
+14. Incorrectly moving the left pointer backward in a last-seen-index solution.
+15. Ignoring integer bounds in String-to-Integer conversion.
+16. Confusing char UTF-16 code units with full Unicode code points.
+17. Using default locale for identifiers when Locale.ROOT is safer.
+18. Off-by-one errors in substring ranges and window lengths.
+
+============================================================
+17. COMPLEXITY QUICK REFERENCE
+============================================================
+
+length(), charAt(): O(1)
+equals(): O(n) worst case
+substring(): typically O(k) to construct a result in modern Java, where k is result length
+indexOf()/contains(): implementation- and input-dependent; naive search can be O(n*m)
+toCharArray(): O(n) time and O(n) space
+toLowerCase()/toUpperCase(): O(n) time and new result when transformation is needed
+StringBuilder append(): amortized O(1) per append; total O(n) for n appended characters
+StringBuilder reverse(): O(n)
+Sort characters: O(n log n)
+Frequency count: O(n)
+Two-pointer palindrome: O(n), O(1) extra space
+Longest substring without repeats: O(n) average, O(char-set) space
+Minimum window substring: O(n) average with appropriate frequency map
+Expand-around-center palindrome: O(n^2) time, O(1) extra space
+KMP: O(n + m) time, O(m) extra space
+Naive substring search: O(n*m) worst case
+
+String operation complexities can depend on JDK implementation and whether a new result
+must be created. Focus on the algorithmic pattern and input/result length.
+
+============================================================
+18. INTERVIEW EXPLANATION TEMPLATE
+============================================================
+
+1. Clarify case sensitivity, allowed characters, and input constraints.
+2. Explain a simple brute-force solution.
+3. Identify the pattern: frequency count, two pointers, sliding window, stack, DP, or KMP.
+4. State the invariant (what remains true as the algorithm progresses).
+5. Walk through an example with duplicates or edge cases.
+6. Explain why the algorithm is correct.
+7. State time and extra-space complexity.
+8. Code in Java and test empty, one-character, duplicate, and boundary cases.
+
+============================================================
+19. RECOMMENDED PREPARATION ORDER
+============================================================
+
+Stage 1 — Java String basics:
+- Immutability, equals vs ==, charAt, substring, indexOf, split, replace.
+- StringBuilder and character arrays.
+- Reverse String, Valid Palindrome, Longest Common Prefix.
+
+Stage 2 — Frequency and anagrams:
+- Valid Anagram, Group Anagrams, First Unique Character, Ransom Note.
+
+Stage 3 — Two pointers and sliding window:
+- Longest Substring Without Repeating Characters.
+- Permutation in String, Find All Anagrams.
+- Longest Repeating Character Replacement.
+- Minimum Window Substring.
+
+Stage 4 — Stack and parsing:
+- Valid Parentheses, Remove Adjacent Duplicates, Decode String, Simplify Path.
+
+Stage 5 — Palindrome and matching:
+- Longest Palindromic Substring, Palindromic Substrings, KMP/LPS.
+
+Stage 6 — Dynamic programming stretch:
+- Word Break, Edit Distance, Longest Common Subsequence.
+
+For every problem:
+- Try independently for 20–30 minutes.
+- Explain brute force before optimizing.
+- Identify the pattern and invariant.
+- Code in Java without copying.
+- Test edge cases.
+- State time and space complexity.
+- Re-solve after 1 day, 3 days, and 1 week.
+
+============================================================
+20. FINAL REVISION QUESTIONS
+============================================================
+
+1. Why is String immutable in Java?
+2. Difference between == and equals()?
+3. What is the difference between String, StringBuilder, and StringBuffer?
+4. What does substring(start, end) include?
+5. Difference between contains(), indexOf(), and matches()?
+6. Why is split(".") not the way to split on a literal dot?
+7. What does isEmpty() check compared with isBlank()?
+8. When should you use a 26-element frequency array versus a HashMap?
+9. How does the sliding-window left pointer move for longest substring without repeats?
+10. How do you handle duplicate required characters in Minimum Window Substring?
+11. How does KMP use the LPS array?
+12. Why can repeated string concatenation be inefficient?
+13. How do you reverse a string efficiently?
+14. What are the Unicode limitations of char-based algorithms?
+15. Which edge cases did you test?
+
+END OF STRING NOTES
