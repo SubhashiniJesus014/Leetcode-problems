@@ -1,0 +1,954 @@
+DSA STACK COMPLETE NOTES
+Product-Based Company Interview Preparation
+Language focus: Java
+============================================================
+
+HOW TO USE THESE NOTES
+1. Learn the core concept and Java built-in methods.
+2. Dry-run every example by hand.
+3. Solve the practice questions in the order given.
+4. For each problem, explain the approach, correctness, time complexity, and space complexity aloud.
+5. Prefer ArrayDeque for a stack in modern Java unless a problem specifically requires Stack or needs legacy Stack methods.
+
+CONTENTS
+1. Stack fundamentals
+2. Core operations and complexity
+3. Java Stack built-in methods
+4. Deque as a stack
+5. Implement a stack
+6. Stack patterns for interviews
+7. Important problems with approaches and Java code
+8. Monotonic stack
+9. Expression and bracket problems
+10. Design questions
+11. Common mistakes
+12. Complexity summary
+13. Interview questions and answers
+14. Practice checklist
+
+============================================================
+1. STACK FUNDAMENTALS
+============================================================
+
+A stack is a linear data structure that follows LIFO:
+Last In, First Out.
+
+Example:
+Push 10, push 20, push 30
+Stack top -> 30
+             20
+             10
+
+Pop removes 30 first, then 20, then 10.
+
+Real-world examples:
+- Undo and redo
+- Browser history (often modeled with stacks)
+- Function calls and recursion call stack
+- Parsing expressions
+- Checking balanced brackets
+- Depth-first search (DFS)
+- Next greater/smaller element problems
+- Backtracking
+
+Important terms:
+- Top/peek: inspect the most recently added item without removing it.
+- Push: add an item to the top.
+- Pop: remove the top item.
+- Underflow: trying to remove/read from an empty stack.
+- Overflow: exceeding capacity in a fixed-size stack implementation.
+
+A stack is an ADT (abstract data type): it defines behavior, not one required internal implementation. It can be implemented using an array, a linked list, or a deque.
+
+============================================================
+2. CORE OPERATIONS AND COMPLEXITY
+============================================================
+
+Operation              Meaning                         Typical time
+push(x)                 Add x to top                    O(1) amortized
+pop()                   Remove and return top           O(1)
+peek()/top()            Read top without removing       O(1)
+isEmpty()               Check whether empty             O(1)
+size()                  Number of elements              O(1)
+search(x)               Search in Java Stack             O(n)
+contains(x)             Check membership                 O(n)
+
+For an array-backed stack, push is usually O(1) amortized because the backing array occasionally grows. A resize can cost O(n) for that single operation.
+
+============================================================
+3. JAVA BUILT-IN STACK METHODS
+============================================================
+
+Legacy Java class:
+import java.util.Stack;
+
+Stack<Integer> st = new Stack<>();
+
+Main Stack methods:
+1. push(E item)
+   Adds item to the top and returns the pushed item.
+   st.push(10);
+
+2. pop()
+   Removes and returns the top item.
+   int x = st.pop();
+   Throws EmptyStackException if empty.
+
+3. peek()
+   Returns the top item without removing it.
+   int x = st.peek();
+   Throws EmptyStackException if empty.
+
+4. empty()
+   Returns true if the stack has no elements.
+   if (st.empty()) { ... }
+
+5. search(Object o)
+   Returns the 1-based position from the top; returns -1 if not found.
+   If stack is [10, 20, 30] with 30 at top:
+   st.search(30) == 1
+   st.search(10) == 3
+   st.search(99) == -1
+
+Useful inherited Vector methods (Stack extends Vector):
+- size()                 number of elements
+- isEmpty()              whether empty
+- get(index)             element at zero-based index
+- set(index, value)      replace an element at an index; returns old value
+- add(value)             append to the Vector end (not recommended as stack style)
+- add(index, value)      insert at index
+- remove(index)          remove item at index
+- remove(Object)         remove matching object
+- contains(value)        membership test
+- indexOf(value)         first matching index, or -1
+- lastIndexOf(value)     last matching index, or -1
+- clear()                remove all elements
+- toArray()              convert to array
+- iterator()             get an iterator
+- elements()             legacy Enumeration
+- capacity()             current backing capacity
+- ensureCapacity(n)      request backing capacity
+- trimToSize()           reduce capacity toward current size
+- firstElement()         first Vector element
+- lastElement()          last Vector element
+- elementAt(index)       element at index
+- insertElementAt(value, index)
+- setElementAt(value, index)
+- removeElement(value)
+- removeElementAt(index)
+- removeAllElements()
+- addElement(value)
+- copyInto(array)
+- subList(from, to)
+- forEach(action)
+- containsAll(collection)
+- addAll(collection)
+- removeAll(collection)
+- retainAll(collection)
+- replaceAll(operator)   replace each element using an operator
+- sort(comparator)       sort the underlying Vector
+- removeIf(predicate)    remove matching elements
+- stream() / parallelStream()
+- spliterator()
+
+Important note about "replace":
+- set(index, value) replaces one item at a specific index.
+- replaceAll(operator) transforms every element.
+These are inherited Vector/List methods, not special LIFO operations. Avoid using arbitrary index-based methods in algorithm solutions when a true stack operation is intended.
+
+Safe usage:
+if (!st.isEmpty()) {
+    int top = st.peek();
+}
+if (!st.isEmpty()) {
+    int removed = st.pop();
+}
+
+Example:
+Stack<Integer> st = new Stack<>();
+st.push(5);
+st.push(8);
+System.out.println(st.peek()); // 8
+System.out.println(st.pop());  // 8
+System.out.println(st.size()); // 1
+System.out.println(st.empty()); // false
+st.clear();
+
+Do not call pop() or peek() without checking emptiness when the stack may be empty.
+
+============================================================
+4. DEQUE AS A STACK (PREFERRED MODERN JAVA STYLE)
+============================================================
+
+Recommended:
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+Deque<Integer> st = new ArrayDeque<>();
+
+Use these methods:
+- push(x): add to the front/top
+- pop(): remove and return the front/top; throws if empty
+- peek(): inspect the front/top; returns null if empty
+- isEmpty()
+- size()
+- clear()
+- contains(x)
+
+Example:
+Deque<Integer> st = new ArrayDeque<>();
+st.push(10);
+st.push(20);
+System.out.println(st.peek()); // 20
+System.out.println(st.pop());  // 20
+
+Difference worth remembering:
+- Stack is a legacy synchronized class extending Vector.
+- ArrayDeque is generally preferred for single-threaded stack use because it is designed as a deque and avoids the overhead of Vector synchronization.
+- ArrayDeque does not allow null elements.
+- ArrayDeque's pop() throws if empty; peek() returns null if empty.
+- Do not mix queue-end operations with stack operations unless the design requires it.
+
+For most interview solutions, this is a good default:
+Deque<Integer> st = new ArrayDeque<>();
+
+============================================================
+5. IMPLEMENTING A STACK
+============================================================
+
+A. Using Java's built-in stack
+Stack<Integer> st = new Stack<>();
+st.push(1);
+st.push(2);
+int top = st.peek();
+int removed = st.pop();
+
+B. Simple fixed-size array implementation
+
+class MyStack {
+    private int[] arr;
+    private int top;
+
+    MyStack(int capacity) {
+        arr = new int[capacity];
+        top = -1;
+    }
+
+    void push(int value) {
+        if (top == arr.length - 1) {
+            throw new IllegalStateException("Stack overflow");
+        }
+        arr[++top] = value;
+    }
+
+    int pop() {
+        if (top == -1) {
+            throw new IllegalStateException("Stack underflow");
+        }
+        return arr[top--];
+    }
+
+    int peek() {
+        if (top == -1) {
+            throw new IllegalStateException("Stack is empty");
+        }
+        return arr[top];
+    }
+
+    boolean isEmpty() {
+        return top == -1;
+    }
+
+    int size() {
+        return top + 1;
+    }
+}
+
+C. Linked-list implementation idea
+- Each node stores a value and a next reference.
+- The head is the top.
+- Push: insert a node at the head, O(1).
+- Pop: remove the head, O(1).
+- Peek: read the head value, O(1).
+- Dynamic size, but every node has reference/object overhead.
+
+Interview follow-up: Array vs linked list?
+- Array: cache-friendly, less per-item overhead, may resize or have fixed capacity.
+- Linked list: grows node by node, but uses extra references and allocations.
+- Both can support O(1) push/pop at the top when implemented properly.
+
+============================================================
+6. STACK PATTERNS FOR INTERVIEWS
+============================================================
+
+PATTERN 1: MATCHING / NESTED STRUCTURE
+Examples: Valid Parentheses, simplify path, nested expressions.
+Idea: push opening symbols or path components; use them when a matching closing symbol arrives.
+
+PATTERN 2: MONOTONIC STACK
+Examples: Next Greater Element, Daily Temperatures, Largest Rectangle in Histogram.
+Idea: keep stack values or indices in increasing/decreasing order. Pop elements that cannot be the answer for the current item.
+
+PATTERN 3: EXPRESSION PROCESSING
+Examples: Evaluate Reverse Polish Notation, infix/postfix conversion.
+Idea: store operands or operators until enough information is available.
+
+PATTERN 4: SIMULATION / HISTORY
+Examples: Min Stack, browser history, undo.
+Idea: store previous states or extra information so the needed operation is efficient.
+
+PATTERN 5: DFS / BACKTRACKING
+Idea: use a stack to track nodes or states that remain to be processed.
+
+PATTERN 6: CONTRIBUTION / BOUNDARIES
+Examples: Sum of Subarray Minimums, Largest Rectangle in Histogram.
+Idea: find previous/next smaller boundaries using a monotonic stack.
+
+HOW TO RECOGNIZE A STACK PROBLEM
+Ask:
+- Does the most recent unfinished item need to be handled first?
+- Are there nested opening/closing symbols?
+- Do we need the next greater/smaller element?
+- Can some previous candidates be permanently discarded?
+- Do we need to reverse order or maintain history?
+- Does a problem mention nearest greater/smaller element on either side?
+
+============================================================
+7. IMPORTANT STACK QUESTIONS AND APPROACHES
+============================================================
+
+QUESTION 1: VALID PARENTHESES
+Problem: Given a string containing (), {}, [], decide if brackets are balanced and correctly nested.
+
+Approach:
+- Push every opening bracket.
+- On a closing bracket, the stack must not be empty.
+- Pop the top and check that the types match.
+- At the end, the stack must be empty.
+
+Java:
+class Solution {
+    public boolean isValid(String s) {
+        Deque<Character> st = new ArrayDeque<>();
+
+        for (char c : s.toCharArray()) {
+            if (c == '(' || c == '[' || c == '{') {
+                st.push(c);
+            } else {
+                if (st.isEmpty()) return false;
+                char open = st.pop();
+
+                if (c == ')' && open != '(') return false;
+                if (c == ']' && open != '[') return false;
+                if (c == '}' && open != '{') return false;
+            }
+        }
+        return st.isEmpty();
+    }
+}
+Time: O(n). Space: O(n).
+Common trap: checking only the number of opening and closing brackets is insufficient; order matters.
+
+QUESTION 2: MIN STACK
+Design a stack that supports push, pop, top, and retrieving the minimum in O(1).
+
+Approach:
+- Maintain one stack for values and another for minimums.
+- When pushing x, push x to minStack if it is less than or equal to the current minimum.
+- When popping x, also pop minStack if x equals its top.
+
+Java:
+class MinStack {
+    private Deque<Integer> values = new ArrayDeque<>();
+    private Deque<Integer> mins = new ArrayDeque<>();
+
+    public void push(int val) {
+        values.push(val);
+        if (mins.isEmpty() || val <= mins.peek()) mins.push(val);
+    }
+
+    public void pop() {
+        int val = values.pop();
+        if (val == mins.peek()) mins.pop();
+    }
+
+    public int top() {
+        return values.peek();
+    }
+
+    public int getMin() {
+        return mins.peek();
+    }
+}
+Time per operation: O(1). Extra space: O(n).
+Why <=, not just <: duplicate minimum values must be tracked.
+
+QUESTION 3: NEXT GREATER ELEMENT TO THE RIGHT
+For each element, find the first greater element to its right; if none exists, return -1.
+
+Approach:
+- Scan from right to left.
+- Pop stack values that are less than or equal to the current value; they cannot be the next greater element.
+- The remaining top, if present, is the answer.
+- Push current value.
+
+Java:
+int[] nextGreaterRight(int[] a) {
+    int n = a.length;
+    int[] ans = new int[n];
+    Deque<Integer> st = new ArrayDeque<>();
+
+    for (int i = n - 1; i >= 0; i--) {
+        while (!st.isEmpty() && st.peek() <= a[i]) st.pop();
+        ans[i] = st.isEmpty() ? -1 : st.peek();
+        st.push(a[i]);
+    }
+    return ans;
+}
+Time: O(n); space: O(n).
+Each element is pushed once and popped at most once.
+
+QUESTION 4: DAILY TEMPERATURES
+For each day, return how many days until a warmer temperature; return 0 if none.
+
+Approach:
+- Store indices, not temperatures, because the answer is a distance between indices.
+- Scan left to right.
+- While current temperature is warmer than the temperature at the index on top, pop that index and calculate i - previousIndex.
+- Push current index.
+
+Java:
+int[] dailyTemperatures(int[] temperatures) {
+    int n = temperatures.length;
+    int[] ans = new int[n];
+    Deque<Integer> st = new ArrayDeque<>();
+
+    for (int i = 0; i < n; i++) {
+        while (!st.isEmpty() &&
+               temperatures[i] > temperatures[st.peek()]) {
+            int prev = st.pop();
+            ans[prev] = i - prev;
+        }
+        st.push(i);
+    }
+    return ans;
+}
+Time: O(n); space: O(n).
+Key detail: temperatures[st.peek()] is valid because the stack stores indices, and the index is used to access the original array.
+
+QUESTION 5: NEXT GREATER ELEMENT II (CIRCULAR ARRAY)
+Approach:
+- Simulate two passes by looping from 2*n-1 down to 0.
+- Use i % n to get the real index.
+- Only write answers during the first logical pass (i < n).
+- Maintain a decreasing stack of candidate values or indices.
+
+Java:
+int[] nextGreaterElements(int[] nums) {
+    int n = nums.length;
+    int[] ans = new int[n];
+    Arrays.fill(ans, -1);
+    Deque<Integer> st = new ArrayDeque<>();
+
+    for (int i = 2 * n - 1; i >= 0; i--) {
+        int idx = i % n;
+        while (!st.isEmpty() && st.peek() <= nums[idx]) st.pop();
+        if (i < n && !st.isEmpty()) ans[idx] = st.peek();
+        st.push(nums[idx]);
+    }
+    return ans;
+}
+Time: O(n); space: O(n).
+
+QUESTION 6: REMOVE ALL ADJACENT DUPLICATES
+Example: "abbaca" -> "ca".
+
+Approach:
+- Read characters left to right.
+- If current character equals the stack top, pop.
+- Otherwise push current character.
+- Build the result from the stack in the correct order.
+
+Java:
+String removeDuplicates(String s) {
+    Deque<Character> st = new ArrayDeque<>();
+    for (char c : s.toCharArray()) {
+        if (!st.isEmpty() && st.peek() == c) st.pop();
+        else st.push(c);
+    }
+
+    StringBuilder ans = new StringBuilder();
+    while (!st.isEmpty()) ans.append(st.removeLast());
+    return ans.toString();
+}
+Time: O(n); space: O(n).
+
+QUESTION 7: EVALUATE REVERSE POLISH NOTATION (POSTFIX)
+Example: ["2","1","+","3","*"] -> 9.
+
+Approach:
+- Push numbers.
+- When an operator appears, pop the right operand first, then the left operand.
+- Apply left operator right, then push the result.
+
+Java:
+int evalRPN(String[] tokens) {
+    Deque<Integer> st = new ArrayDeque<>();
+    for (String token : tokens) {
+        if (token.equals("+") || token.equals("-") ||
+            token.equals("*") || token.equals("/")) {
+            int b = st.pop();
+            int a = st.pop();
+            int result = 0;
+
+            switch (token) {
+                case "+": result = a + b; break;
+                case "-": result = a - b; break;
+                case "*": result = a * b; break;
+                case "/": result = a / b; break;
+            }
+            st.push(result);
+        } else {
+            st.push(Integer.parseInt(token));
+        }
+    }
+    return st.pop();
+}
+Time: O(n); space: O(n).
+Critical trap: for subtraction and division, operand order matters.
+
+QUESTION 8: SIMPLIFY UNIX PATH
+Approach:
+- Split the path by '/'.
+- Ignore empty pieces and ".".
+- For "..", remove the previous directory if one exists.
+- Otherwise push the directory name.
+- Join the stack from bottom to top with '/'.
+
+Time: O(n); space: O(n).
+
+QUESTION 9: ASTEROID COLLISION
+Each positive asteroid moves right and each negative asteroid moves left.
+
+Approach:
+- A collision is possible only when the stack top is positive and current asteroid is negative.
+- Compare absolute sizes.
+- If top is smaller, pop and continue comparing.
+- If equal, pop both by discarding current and stopping.
+- If top is larger, discard current.
+- Otherwise push current.
+
+Important: use long or safe comparison if absolute value of the minimum integer could overflow; typical constraints avoid that issue.
+
+QUESTION 10: LARGEST RECTANGLE IN HISTOGRAM
+Given bar heights, find the largest rectangle area.
+
+Approach:
+- Maintain a stack of indices with increasing heights.
+- When a lower height appears, pop taller bars.
+- For a popped bar, current index is the right boundary; new stack top is the previous smaller boundary.
+- Width = rightIndex - leftSmallerIndex - 1.
+- Use a sentinel iteration at i == n to flush remaining bars.
+
+Java:
+int largestRectangleArea(int[] heights) {
+    int n = heights.length;
+    Deque<Integer> st = new ArrayDeque<>();
+    int maxArea = 0;
+
+    for (int i = 0; i <= n; i++) {
+        int current = (i == n) ? 0 : heights[i];
+
+        while (!st.isEmpty() &&
+               current < heights[st.peek()]) {
+            int h = heights[st.pop()];
+            int leftSmaller = st.isEmpty() ? -1 : st.peek();
+            int width = i - leftSmaller - 1;
+            maxArea = Math.max(maxArea, h * width);
+        }
+        st.push(i);
+    }
+    return maxArea;
+}
+Time: O(n); space: O(n).
+Implementation note: at i == n, the code uses a sentinel height of 0 and does not access heights[n]. Pushing index n is harmless because the loop ends immediately.
+
+QUESTION 11: MAXIMUM RECTANGLE IN A BINARY MATRIX
+Approach:
+- Treat each row as the base of a histogram.
+- Maintain column heights: if cell is '1', increment height; if '0', reset height to zero.
+- For each row, compute largest rectangle in the histogram.
+Time: O(rows * cols); extra space: O(cols).
+
+QUESTION 12: SUM OF SUBARRAY MINIMUMS
+Approach:
+- For every element, count how many subarrays have it as their minimum.
+- Find previous strictly smaller and next smaller-or-equal (or the reverse convention) boundaries with a monotonic stack.
+- Contribution = value * number of choices on the left * number of choices on the right.
+- Handle duplicates consistently to avoid double counting.
+Time: O(n); space: O(n).
+Use long for contributions and apply the required modulus.
+
+QUESTION 13: ONLINE STOCK SPAN
+For each day, report the number of consecutive days up to today with price <= today's price.
+
+Approach:
+- Keep indices of prices in decreasing order.
+- Pop indices whose prices are <= current price.
+- If stack is empty, span = i + 1; otherwise span = i - st.peek().
+- Push current index.
+Time: O(n) total across all operations.
+
+QUESTION 14: DECODE STRING
+Example: "3[a2[c]]" -> "accaccacc".
+
+Approach:
+- Use stacks to save repeat counts and previous strings at each '['.
+- Build the current string until a closing bracket.
+- Pop previous string and count, then append current string count times.
+Time: proportional to the input plus output size; space depends on nesting and output.
+
+QUESTION 15: BACKSPACE STRING COMPARE
+Approach option 1:
+- Process each string using a stack; '#' removes the last character if one exists.
+- Compare final strings.
+Time: O(m+n); space: O(m+n).
+Optimized follow-up: two pointers from the end can achieve O(1) extra space.
+
+QUESTION 16: REVERSE A STRING USING A STACK
+- Push each character.
+- Pop characters to construct the reversed string.
+Time: O(n); space: O(n).
+Interview follow-up: a character array with two pointers can reverse in O(1) auxiliary space.
+
+QUESTION 17: SORT A STACK
+- Use one temporary stack.
+- Pop each item from the original stack.
+- Move items from the temporary stack back while they are out of order.
+- Insert the current item in its correct position.
+- State whether the smallest or largest should be on top; problem conventions differ.
+Typical time: O(n^2); extra space: O(n).
+
+QUESTION 18: INSERT AT THE BOTTOM OF A STACK
+- Pop all items recursively or into temporary storage.
+- Insert the new value once the stack becomes empty.
+- Restore the saved items.
+Time: O(n); recursion/extra space: O(n).
+
+QUESTION 19: REVERSE A STACK
+- Recursively pop all elements.
+- Insert each popped element at the bottom during recursion unwind.
+Time: O(n^2) for the simple recursive method; recursion space O(n).
+
+QUESTION 20: REMOVE K DIGITS
+Given a numeric string and k, make the smallest possible number.
+
+Approach:
+- Use a monotonic increasing stack of digits.
+- While k > 0 and stack top is greater than current digit, pop.
+- Push current digit.
+- If k remains, remove digits from the end/top.
+- Remove leading zeros; if empty, return "0".
+Time: O(n); space: O(n).
+
+QUESTION 21: VALID STACK SEQUENCES
+Given pushed and popped sequences, determine if they can result from stack operations.
+
+Approach:
+- Push each value from pushed.
+- While the stack top matches the next expected popped value, pop and advance.
+- Valid if all popped values were matched.
+Time: O(n); space: O(n).
+
+QUESTION 22: DAILY TEMPERATURES / NEXT GREATER ELEMENT VARIANTS
+Learn to change these details:
+- Next greater vs next smaller.
+- Left-to-right vs right-to-left.
+- Store values vs indices.
+- Strict comparison '>' vs non-strict comparison '>='.
+- Linear vs circular array.
+This flexibility is more important than memorizing one solution.
+
+============================================================
+8. MONOTONIC STACK: MUST-KNOW THEORY
+============================================================
+
+A monotonic stack keeps values or their corresponding array values in sorted order from bottom to top.
+
+Increasing stack:
+- Values increase from bottom to top.
+- While processing a new value, pop larger values when needed.
+- Commonly used for previous/next smaller boundaries and histogram problems.
+
+Decreasing stack:
+- Values decrease from bottom to top.
+- Commonly used for next greater element patterns.
+
+Do not memorize labels alone: descriptions sometimes differ by whether they describe bottom-to-top order or the candidates' order. Verify the invariant in your own code.
+
+Store VALUES when only the answer value matters.
+Store INDICES when you need:
+- Distance between elements
+- Left/right boundaries
+- Width or span
+- Original array lookup
+- Distinguishing duplicate values at different positions
+
+Strict vs non-strict comparisons:
+- Pop <= current when looking for a strictly greater value.
+- Pop < current when equal values are allowed as candidates for a greater-or-equal answer.
+- For subarray contribution problems, decide how equal values are assigned and use complementary strict/non-strict boundaries consistently.
+
+Amortized analysis:
+Even if one iteration pops many elements, each item is pushed once and popped at most once. Therefore the total work is O(n), not O(n^2).
+
+============================================================
+9. EXPRESSION AND BRACKET PROBLEMS
+============================================================
+
+Must understand:
+- Balanced parentheses / Valid Parentheses
+- Minimum Add to Make Parentheses Valid
+- Minimum Remove to Make Valid Parentheses
+- Longest Valid Parentheses
+- Evaluate Reverse Polish Notation
+- Infix to postfix conversion
+- Infix to prefix conversion
+- Evaluate infix expressions
+- Basic Calculator
+- Basic Calculator II
+- Decode String
+- Remove Invalid Parentheses (advanced; often BFS/backtracking rather than only a stack)
+
+Operator precedence basics:
+- Parentheses first.
+- Multiplication and division before addition and subtraction.
+- Operators of equal precedence are often evaluated left to right, except exponentiation in languages that define it as right-associative.
+
+For postfix evaluation, operands are pushed and operators consume operands.
+For infix conversion, operators may need to remain on an operator stack until precedence/associativity allows output.
+
+============================================================
+10. STACK DESIGN QUESTIONS
+============================================================
+
+1. Design Min Stack
+   Get minimum in O(1), using a second stack or encoded values.
+
+2. Implement Stack Using Queues
+   Use one or two queues. Explain which operation becomes O(n) and which is O(1).
+
+3. Implement Queue Using Stacks
+   Use an input stack and an output stack. Transfer only when output stack is empty. Amortized O(1) per operation.
+
+4. Design a stack supporting getMax()
+   Mirror the Min Stack approach with a maximum-tracking stack.
+
+5. Design a stack supporting getMin() and getMax()
+   Track minimum and maximum values or use auxiliary structures.
+
+6. Design a frequency stack
+   Pop the most frequent value; if tied, pop the most recently pushed among tied values. Typical design uses a frequency map, frequency-to-stack map, and max frequency.
+
+7. Design browser back/forward
+   Commonly use two stacks: back history and forward history.
+
+8. Design undo/redo
+   Store past and future states or actions; explain how a new action clears redo history.
+
+9. Implement stack with a linked list
+   Head is top; push/pop at head in O(1).
+
+10. Implement two stacks in one array
+    One grows from left to right and the other from right to left. Overflow when the pointers meet.
+
+11. Design a stack with O(1) middle operation (advanced)
+    Consider a doubly linked list plus a middle pointer; update the middle pointer after pushes and pops.
+
+12. Maximum frequency stack (LeetCode 895)
+    Maintain frequency[value], group[frequency] stack, and maxFreq.
+
+============================================================
+11. COMMON MISTAKES
+============================================================
+
+- Calling pop() or peek() on an empty stack.
+- Using values when indices are required for distances.
+- Reversing operand order for subtraction or division in postfix evaluation.
+- Forgetting that Java Stack.search() is 1-based from the top.
+- Assuming Stack has a replace() method. Replacement is usually set(index, value) or inherited replaceAll(operator).
+- Using arbitrary Vector methods as if they were normal stack operations.
+- Confusing a stack's top with array index 0.
+- Returning while unmatched opening brackets remain.
+- Forgetting duplicate values in Min Stack.
+- Using the wrong strict/non-strict comparison in monotonic stack logic.
+- Using int where area or accumulated contribution can overflow; consider long.
+- Claiming O(n^2) for a standard monotonic stack without analyzing total pushes/pops.
+- Accessing array[i] when i == n in a sentinel loop.
+- Assuming every problem mentioning "nearest" requires a stack; first check whether the required relation is next/previous greater/smaller.
+- Using recursion without considering recursion-stack space and maximum depth.
+
+============================================================
+12. COMPLEXITY SUMMARY
+============================================================
+
+Operation / algorithm                  Time             Extra space
+push / pop / peek                      O(1)             O(1) per operation
+Valid Parentheses                      O(n)             O(n)
+Next Greater Element                   O(n)             O(n)
+Daily Temperatures                     O(n)             O(n)
+Circular Next Greater                  O(n)             O(n)
+Min Stack operations                   O(1)             O(n) total
+Evaluate RPN                           O(n)             O(n)
+Largest Rectangle Histogram            O(n)             O(n)
+Max Rectangle Binary Matrix             O(rows*cols)     O(cols)
+Sum of Subarray Minimums               O(n)             O(n)
+Stock Span                             O(n) total       O(n)
+Remove K Digits                        O(n)             O(n)
+Asteroid Collision                     O(n)             O(n)
+Sort Stack (simple method)             O(n^2)           O(n)
+Reverse Stack recursively              O(n^2)           O(n) recursion
+
+============================================================
+13. INTERVIEW QUESTIONS WITH SHORT ANSWERS
+============================================================
+
+Q1. What is a stack?
+A. A linear ADT following Last In, First Out.
+
+Q2. What is the difference between push and pop?
+A. Push adds to the top; pop removes and returns the top.
+
+Q3. What is the difference between peek and pop?
+A. Peek reads the top without removing it; pop removes it.
+
+Q4. What is stack underflow?
+A. Attempting to remove/read an item when the stack is empty.
+
+Q5. How can a stack be implemented?
+A. With an array, linked list, or deque.
+
+Q6. Why is ArrayDeque usually preferred over Stack in Java?
+A. Stack is a legacy synchronized Vector subclass. ArrayDeque is designed for deque operations and is usually preferable for ordinary single-threaded stack use.
+
+Q7. Is Java Stack.search() zero-based?
+A. No. It returns a 1-based position measured from the top, or -1 if absent.
+
+Q8. Why store indices in Daily Temperatures?
+A. The answer is a distance, so we need the current index minus the earlier index.
+
+Q9. Why is monotonic stack O(n)?
+A. Each element is pushed once and popped at most once, so total stack operations are linear.
+
+Q10. When do you use a stack instead of a queue?
+A. When the newest pending item should be processed first (LIFO); queues process oldest first (FIFO).
+
+Q11. What does recursion have to do with stacks?
+A. Each function call creates a stack frame containing execution state such as parameters and local variables.
+
+Q12. What is a monotonic stack?
+A. A stack that maintains a monotonic order of values or their corresponding array values.
+
+Q13. How do you avoid duplicate-minimum bugs in Min Stack?
+A. Push equal minimum values too, using <=, and pop a minimum when the removed value equals the auxiliary stack top.
+
+Q14. Can stack operations all be O(1)?
+A. Push, pop, and peek can be O(1); searching an arbitrary value is generally O(n).
+
+Q15. What is amortized O(1)?
+A. The average cost per operation across a sequence, even though occasional individual operations can cost more, such as resizing a dynamic array.
+
+Q16. Is a stack always a class?
+A. No. Stack is an ADT; Java provides classes that implement it, but the concept is independent of any specific class.
+
+Q17. What is the difference between stack and heap memory?
+A. The call stack stores function-call frames and local execution state. The heap stores dynamically allocated objects. Exact implementation details depend on the runtime.
+
+Q18. What is a sentinel in a histogram solution?
+A. A conceptual extra value, often 0, used to force remaining stack elements to be processed.
+
+Q19. Why can equal values be tricky in subarray minimum problems?
+A. Equal elements can claim the same subarray unless boundary comparisons consistently assign each subarray to one occurrence.
+
+Q20. How should you explain a stack solution in an interview?
+A. State the invariant, explain when you push and pop, prove why popped candidates can never help later, then give time and space complexity.
+
+============================================================
+14. PRACTICE CHECKLIST FOR PRODUCT-BASED COMPANIES
+============================================================
+
+LEVEL 1 — MUST SOLVE FIRST
+[ ] Implement Stack using array
+[ ] Valid Parentheses
+[ ] Min Stack
+[ ] Next Greater Element I
+[ ] Daily Temperatures
+[ ] Evaluate Reverse Polish Notation
+[ ] Remove All Adjacent Duplicates in String
+[ ] Backspace String Compare
+[ ] Valid Stack Sequences
+[ ] Implement Queue using Stacks
+[ ] Implement Stack using Queues
+
+LEVEL 2 — IMPORTANT MONOTONIC STACK
+[ ] Next Greater Element II
+[ ] Previous Greater Element
+[ ] Next Smaller Element
+[ ] Previous Smaller Element
+[ ] Online Stock Span
+[ ] Asteroid Collision
+[ ] Remove K Digits
+[ ] Largest Rectangle in Histogram
+[ ] Maximal Rectangle
+[ ] Sum of Subarray Minimums
+
+LEVEL 3 — STRING / EXPRESSION / DESIGN
+[ ] Simplify Path
+[ ] Decode String
+[ ] Basic Calculator
+[ ] Basic Calculator II
+[ ] Minimum Add to Make Parentheses Valid
+[ ] Longest Valid Parentheses
+[ ] Sort a Stack
+[ ] Reverse a Stack
+[ ] Insert at Bottom of Stack
+[ ] Two Stacks in One Array
+[ ] Frequency Stack
+[ ] Browser Back/Forward Design
+
+LEVEL 4 — ADVANCED / FOLLOW-UP
+[ ] Trapping Rain Water (compare two pointers and stack approaches)
+[ ] Maximum Width Ramp
+[ ] Find 132 Pattern
+[ ] Sum of Subarray Ranges
+[ ] Car Fleet
+[ ] Remove Duplicate Letters
+[ ] Minimum Remove to Make Valid Parentheses
+[ ] Maximum Frequency Stack
+[ ] Design stack with getMin and getMax
+[ ] Largest Rectangle in Histogram: explain multiple solutions and proof
+
+For each problem, be able to state:
+[ ] Brute-force idea
+[ ] Optimized stack idea
+[ ] Why the stack invariant works
+[ ] Time complexity
+[ ] Space complexity
+[ ] Edge cases
+[ ] Java implementation without looking at notes
+
+============================================================
+FINAL REVISION RULE
+============================================================
+
+For stack interview questions, first identify what the stack should remember:
+- Values?
+- Indices?
+- Opening brackets?
+- Operators?
+- Previous states?
+- Candidates in monotonic order?
+
+Then define exactly when an item is pushed and when it can safely be popped. This is the heart of most stack problems.
+
+These notes cover the core stack ADT, Java's built-in Stack methods (including inherited Vector/List methods such as set and replaceAll), preferred Deque usage, implementation, common interview patterns, and a structured problem checklist. Company-specific interview sets vary, so use the checklist as a preparation roadmap rather than a guarantee that every company asks every question.
