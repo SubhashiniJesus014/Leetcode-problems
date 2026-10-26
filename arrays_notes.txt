@@ -1,0 +1,544 @@
+DSA ARRAY COMPLETE NOTES FOR PRODUCT-BASED COMPANY INTERVIEWS
+Language focus: Java
+
+============================================================
+1. ARRAY FUNDAMENTALS
+============================================================
+
+An array stores a fixed number of elements of the same type in indexed positions.
+Java arrays are objects and their length is fixed after creation.
+
+    int[] arr = {10, 20, 30, 40};
+    arr[0]       // 10
+    arr.length   // 4
+
+Indices start at 0. Last valid index is arr.length - 1.
+Invalid indices cause ArrayIndexOutOfBoundsException.
+Use arr.length for arrays, s.length() for Strings, and list.size() for ArrayLists.
+Arrays have fixed length; use ArrayList when you need a resizable collection.
+
+Declaration and creation:
+    int[] a;
+    a = new int[5];
+    int[] b = new int[]{4, 2, 7};
+    int[] c = {4, 2, 7};
+
+Default values:
+- Numeric primitives: 0 / 0.0
+- boolean: false
+- char: '\u0000'
+- Reference types (String[], Integer[]): null
+
+Input:
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    int[] arr = new int[n];
+    for (int i = 0; i < n; i++) arr[i] = sc.nextInt();
+
+============================================================
+2. ARRAY OPERATION COMPLEXITIES
+============================================================
+
+Index access/update: O(1)
+Traverse: O(n)
+Linear search: O(n)
+Copy n elements: O(n)
+Insert/delete in middle with shifting: O(n)
+Reverse in place: O(n) time, O(1) extra space
+Find min/max in unsorted array: O(n)
+Sort: typically O(n log n)
+Binary search in sorted array: O(log n)
+
+Java arrays do not have push(), pop(), insert(), or remove() methods.
+Implement these operations yourself or use ArrayList.
+
+============================================================
+3. JAVA ARRAYS BUILT-IN UTILITIES (java.util.Arrays)
+============================================================
+
+Import:
+    import java.util.Arrays;
+
+A. Arrays.toString(arr)
+Readable output for one-dimensional arrays.
+    System.out.println(Arrays.toString(new int[]{3, 1, 2}));
+    // [3, 1, 2]
+System.out.println(arr) does not print the array contents.
+
+B. Arrays.deepToString(matrix)
+Readable output for nested arrays.
+    int[][] m = {{1, 2}, {3, 4}};
+    System.out.println(Arrays.deepToString(m));
+
+C. Arrays.sort(arr)
+Sorts primitive arrays in ascending order.
+    int[] a = {5, 2, 8, 1};
+    Arrays.sort(a); // [1, 2, 5, 8]
+For reverse order, use an object array:
+    Integer[] a = {5, 2, 8};
+    Arrays.sort(a, Collections.reverseOrder());
+Collections.reverseOrder() does not work directly with int[].
+
+D. Arrays.parallelSort(arr)
+Parallel sorting implementation; know it exists, but Arrays.sort() is usually sufficient.
+
+E. Arrays.binarySearch(arr, key)
+Searches a sorted array.
+    int idx = Arrays.binarySearch(new int[]{1, 3, 5, 7}, 5); // 2
+Sort first. If absent, result is negative and encodes the insertion point:
+-(insertion point) - 1. With duplicates, the returned matching index is not guaranteed
+to be the first or last duplicate.
+
+F. Arrays.equals(a, b)
+Checks same length and corresponding values. `a == b` checks reference identity.
+For nested arrays use Arrays.deepEquals(a, b).
+
+G. Arrays.fill(arr, value)
+Fills all elements:
+    Arrays.fill(arr, 7);
+Range overload:
+    Arrays.fill(arr, 1, 4, 9); // indices 1, 2, 3; end is exclusive
+
+H. Arrays.copyOf(arr, newLength)
+Copies to requested length. Shorter length truncates; longer length pads with default values.
+
+I. Arrays.copyOfRange(arr, from, to)
+Copies from index `from` inclusive to `to` exclusive.
+
+J. System.arraycopy(src, srcPos, dest, destPos, length)
+Efficiently copies a segment between arrays.
+
+K. Arrays.asList(objectArray)
+Creates a fixed-size list backed by the supplied object array.
+    String[] names = {"A", "B"};
+    List<String> list = Arrays.asList(names);
+    list.set(0, "C"); // allowed and changes names[0]
+    // list.add(...) / list.remove(...) throws UnsupportedOperationException
+For a modifiable ArrayList:
+    List<String> mutable = new ArrayList<>(Arrays.asList(names));
+
+Pitfall:
+    int[] nums = {1, 2, 3};
+    Arrays.asList(nums)
+does NOT produce List<Integer>; it produces a list with the int[] as one item.
+
+L. Arrays.stream(arr)
+Useful for aggregate operations:
+    int sum = Arrays.stream(new int[]{1, 2, 3}).sum();
+IntStream supports min(), max(), average(), count(), sorted(), etc.
+
+M. Arrays.setAll(arr, generator)
+Sets values using their index:
+    int[] a = new int[5];
+    Arrays.setAll(a, i -> i * i); // [0, 1, 4, 9, 16]
+
+N. Arrays.compare(a, b), Arrays.mismatch(a, b)
+Modern Java utilities: lexicographic comparison and first differing index.
+Check platform Java version before using newer APIs.
+
+O. Arrays.hashCode(arr), Arrays.deepHashCode(arr)
+Compute hash codes based on array contents.
+
+P. Arrays.parallelPrefix(...) and Arrays.parallelSetAll(...)
+Parallel cumulative operation / assignment utilities; rarely required in DSA interviews.
+
+============================================================
+4. INSERTION AND DELETION
+============================================================
+
+Arrays have fixed length. To insert into a full array, create a new array of length n+1,
+copy items before the insertion index, place the new value, and copy remaining items
+one index to the right. Time O(n), extra space O(n).
+
+To delete, create a length n-1 array, copy items before the deleted index and then copy
+later items one position left. Time O(n), extra space O(n).
+
+In-place solutions may shift elements and leave unused positions when the problem permits.
+
+============================================================
+5. BASIC TRAVERSAL PATTERNS
+============================================================
+
+Left to right:
+    for (int i = 0; i < arr.length; i++) { ... }
+
+Right to left:
+    for (int i = arr.length - 1; i >= 0; i--) { ... }
+
+Enhanced for:
+    for (int x : arr) { ... }
+Use index-based loops when indices or updates are needed.
+
+Two pointers:
+    int left = 0, right = arr.length - 1;
+    while (left < right) {
+        // use arr[left], arr[right]
+        left++;
+        right--;
+    }
+
+============================================================
+6. TWO POINTERS
+============================================================
+
+Useful for sorted arrays, reversing, removing duplicates in place, partitioning, and pair sums.
+
+Reverse in place:
+    int left = 0, right = arr.length - 1;
+    while (left < right) {
+        int temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+        left++;
+        right--;
+    }
+Time O(n), extra space O(1).
+
+Two Sum on a sorted array:
+- If sum is too small, move left forward.
+- If sum is too large, move right backward.
+- If equal, return the pair.
+Time O(n), extra space O(1). Do not apply this directly to unsorted data unless sorting
+and original-index handling are accounted for.
+
+============================================================
+7. SLIDING WINDOW
+============================================================
+
+Used for contiguous subarrays. For a fixed window of size k, calculate the first window,
+then add the new item and subtract the item leaving the window.
+
+Maximum sum of size k:
+    int windowSum = 0;
+    for (int i = 0; i < k; i++) windowSum += arr[i];
+    int best = windowSum;
+    for (int i = k; i < arr.length; i++) {
+        windowSum += arr[i] - arr[i - k];
+        best = Math.max(best, windowSum);
+    }
+Time O(n), extra space O(1).
+
+Variable-size windows expand the right pointer and shrink from the left while a condition
+is violated. Classic sum-based window methods often rely on non-negative numbers; negative
+values may require prefix sums or another technique.
+
+============================================================
+8. PREFIX SUM
+============================================================
+
+    long[] prefix = new long[arr.length + 1];
+    for (int i = 0; i < arr.length; i++) {
+        prefix[i + 1] = prefix[i] + arr[i];
+    }
+    // sum from l to r inclusive:
+    long sum = prefix[r + 1] - prefix[l];
+
+Build O(n), range query O(1), extra space O(n).
+Use long if sums can overflow int.
+
+Related: Range Sum Query, Subarray Sum Equals K (prefix sum + HashMap), difference arrays.
+
+============================================================
+9. KADANE'S ALGORITHM: MAXIMUM SUBARRAY
+============================================================
+
+At each index, either start a new subarray or extend the current one.
+
+    int current = arr[0], best = arr[0];
+    for (int i = 1; i < arr.length; i++) {
+        current = Math.max(arr[i], current + arr[i]);
+        best = Math.max(best, current);
+    }
+
+Time O(n), extra space O(1).
+Initialize from arr[0], not 0, when the subarray must be non-empty and all values may be negative.
+
+============================================================
+10. BINARY SEARCH
+============================================================
+
+Use on sorted arrays or monotonic decision conditions.
+
+    int left = 0, right = arr.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == target) return mid;
+        if (arr[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
+
+Time O(log n), iterative extra space O(1).
+Use left + (right-left)/2 to avoid overflow.
+Know: first/last occurrence, lower/upper bound, rotated arrays, minimum in rotated array,
+peak element, binary search on answer.
+Arrays.binarySearch() is not enough for every variant (e.g. first occurrence).
+
+============================================================
+11. SORTING AND PARTITIONING
+============================================================
+
+Arrays.sort(arr) is useful when sorting simplifies the problem.
+Typical algorithm facts:
+- Merge sort: O(n log n) time, typically O(n) auxiliary space.
+- Quick sort: average O(n log n), worst O(n^2) for a basic implementation.
+- Heap sort: O(n log n) time, O(1) auxiliary space in standard in-place form.
+- Counting sort: O(n + range) when the value range is manageable.
+- Dutch National Flag sorts 0, 1, 2 in O(n) time and O(1) extra space.
+- Quickselect finds kth order statistic in average O(n), depending on pivot strategy.
+
+Always consider whether sorting destroys original index/order requirements.
+
+============================================================
+12. FREQUENCY COUNTING AND HASHING
+============================================================
+
+For small bounded values:
+    int[] freq = new int[101];
+    for (int x : arr) freq[x]++;
+
+For arbitrary integers:
+    Map<Integer, Integer> freq = new HashMap<>();
+    for (int x : arr) freq.put(x, freq.getOrDefault(x, 0) + 1);
+
+HashMap solutions are usually O(n) average time and O(n) space.
+Frequency arrays can be faster/simpler when the range is small and known.
+
+============================================================
+13. ROTATION AND REVERSAL
+============================================================
+
+Right rotate by k using reversal:
+1. If n == 0, return.
+2. k %= n.
+3. Reverse the whole array.
+4. Reverse first k elements.
+5. Reverse remaining n-k elements.
+Time O(n), extra space O(1).
+
+Cyclic placement can help when values are guaranteed to map to positions, such as values in
+[1, n]. Use only when constraints support the mapping.
+
+============================================================
+14. MERGING SORTED ARRAYS AND INTERVALS
+============================================================
+
+Merge sorted arrays by comparing current elements and appending the smaller one.
+Time O(n+m), output space O(n+m) in the usual approach.
+
+Merge intervals:
+1. Sort by interval start.
+2. Keep a current interval.
+3. If the next overlaps, extend the end.
+4. Otherwise, output current and start a new one.
+Typical time O(n log n) due to sorting.
+
+============================================================
+15. PRODUCT OF ARRAY EXCEPT SELF
+============================================================
+
+For each index, return product of all other values without division:
+- First pass stores prefix product before each index.
+- Second pass multiplies by suffix product after each index.
+Time O(n), extra space O(1) excluding the output array when using running prefix/suffix variables.
+Watch for overflow and use the type required by constraints.
+
+============================================================
+16. MAJORITY ELEMENT
+============================================================
+
+If an element occurs more than n/2 times, Boyer-Moore Voting finds a candidate:
+- If counter is zero, choose current value.
+- If current equals candidate, increment; otherwise decrement.
+- If majority is not guaranteed, verify candidate in a second pass.
+Time O(n), extra space O(1).
+
+============================================================
+17. MAXIMUM PRODUCT SUBARRAY
+============================================================
+
+Track both maximum and minimum products ending at the current index, because a negative value
+can turn a negative product into a positive one. Swap the roles when multiplying by a negative.
+Time O(n), extra space O(1).
+
+============================================================
+18. IMPORTANT ARRAY PROBLEMS CHECKLIST
+============================================================
+
+FUNDAMENTALS
+[ ] Find maximum and minimum
+[ ] Reverse array
+[ ] Second largest element
+[ ] Check whether sorted
+[ ] Linear search
+[ ] Remove duplicates from sorted array
+[ ] Move Zeroes
+[ ] Rotate Array
+[ ] Missing Number
+[ ] Find the Duplicate Number
+[ ] Merge Sorted Array
+
+HASHING / FREQUENCY
+[ ] Two Sum
+[ ] Contains Duplicate
+[ ] Majority Element
+[ ] Top K Frequent Elements
+[ ] Longest Consecutive Sequence
+[ ] Subarray Sum Equals K
+
+TWO POINTERS
+[ ] Two Sum II - Sorted Input
+[ ] 3Sum
+[ ] Container With Most Water
+[ ] Trapping Rain Water
+[ ] Sort Colors
+
+SLIDING WINDOW
+[ ] Maximum Sum Subarray of Size K
+[ ] Maximum Average Subarray I
+[ ] Minimum Size Subarray Sum
+[ ] Best Time to Buy and Sell Stock
+[ ] Longest Subarray with at most K distinct values
+
+PREFIX / KADANE / SUFFIX
+[ ] Range Sum Query
+[ ] Product of Array Except Self
+[ ] Maximum Subarray
+[ ] Maximum Product Subarray
+[ ] Maximum Circular Subarray Sum
+[ ] Subarray Sum Equals K
+
+BINARY SEARCH
+[ ] Binary Search
+[ ] Search Insert Position
+[ ] First and Last Position of Element
+[ ] Search in Rotated Sorted Array
+[ ] Find Minimum in Rotated Sorted Array
+[ ] Find Peak Element
+[ ] Koko Eating Bananas / binary search on answer
+[ ] Median of Two Sorted Arrays (advanced)
+
+SORTING / INTERVALS / MATRIX
+[ ] Merge Intervals
+[ ] Insert Interval
+[ ] Kth Largest Element
+[ ] First Missing Positive
+[ ] Set Matrix Zeroes
+[ ] Spiral Matrix
+[ ] Rotate Image
+[ ] Count Inversions
+[ ] Reverse Pairs (advanced)
+
+This list covers common patterns; the exact interview set varies by company.
+
+============================================================
+19. COMMON MISTAKES
+============================================================
+
+1. Using arr.length() instead of arr.length.
+2. Accessing arr[arr.length].
+3. Assuming arrays can grow dynamically.
+4. Printing a reference instead of Arrays.toString().
+5. Comparing array contents with == instead of Arrays.equals().
+6. Calling binarySearch on unsorted data.
+7. Using Collections.reverseOrder() with int[].
+8. Assuming Arrays.asList(intArray) gives List<Integer>.
+9. Sorting when original order or indices matter.
+10. Forgetting duplicates.
+11. Integer overflow in sums/products/prefix sums.
+12. Off-by-one errors in inclusive/exclusive ranges.
+13. Applying classic sliding window sum logic to negative values without checking validity.
+14. Initializing Kadane to zero when all-negative arrays are possible.
+15. Forgetting to handle empty or single-element arrays when allowed.
+
+============================================================
+20. EDGE CASE CHECKLIST
+============================================================
+
+[ ] Empty array, if allowed
+[ ] One or two elements
+[ ] All values equal
+[ ] Ascending and descending arrays
+[ ] Negative values and zeros
+[ ] Duplicates
+[ ] Target absent or at either end
+[ ] Large values / overflow
+[ ] k = 0, k = n, or k > n where relevant
+[ ] All-negative array for maximum subarray
+[ ] Multiple valid answers
+[ ] Whether input may be modified
+
+============================================================
+21. HOW TO EXPLAIN IN AN INTERVIEW
+============================================================
+
+1. Clarify constraints and expected output.
+2. Explain brute force and complexity when useful.
+3. Identify the pattern: two pointers, sliding window, prefix sum, hashing,
+   binary search, sorting, or Kadane.
+4. State the invariant and why it works.
+5. Walk through a small example.
+6. Discuss edge cases and overflow.
+7. State time and extra-space complexity.
+8. Code and test a representative example.
+
+============================================================
+22. RECOMMENDED PREPARATION ORDER
+============================================================
+
+Stage 1: traversal, max/min, reverse, second largest, sorted check, move zeroes.
+Stage 2: Two Sum, Contains Duplicate, Majority Element, Longest Consecutive Sequence.
+Stage 3: Two pointers, 3Sum, Container With Most Water, sliding window, Stock problem.
+Stage 4: Prefix sums, Product Except Self, Maximum Subarray, Maximum Product Subarray.
+Stage 5: Binary Search, first/last occurrence, rotated array, kth largest.
+Stage 6: Merge Intervals, matrix problems, First Missing Positive, advanced patterns.
+
+For every problem:
+- Try independently for 20-30 minutes.
+- Explain brute force.
+- Identify the pattern and invariant.
+- Code in Java without copying.
+- Test edge cases.
+- State time and space complexity.
+- Re-solve after 1 day, 3 days, and 1 week.
+
+============================================================
+23. QUICK COMPLEXITY REVISION
+============================================================
+
+Index access/update: O(1)
+Linear search: O(n)
+Reverse in place: O(n) time, O(1) extra space
+Two pointers: often O(n), O(1) extra space
+Fixed sliding window: O(n), O(1) extra space
+Prefix build: O(n); range query O(1); prefix storage O(n)
+Kadane: O(n), O(1)
+HashMap Two Sum: O(n) average, O(n) space
+Sort: O(n log n) typical
+Binary search: O(log n), O(1) iterative
+3Sum: O(n^2) after sorting
+Merge intervals: O(n log n), O(n) typical
+Product Except Self: O(n), O(1) extra excluding output
+Trapping Rain Water two-pointer: O(n), O(1)
+
+============================================================
+24. FINAL REVISION QUESTIONS
+============================================================
+
+1. Why is array indexing O(1)?
+2. Difference between arr.length, String.length(), and list.size()?
+3. How do you compare arrays by content?
+4. What does binarySearch return when a key is absent?
+5. Why is Arrays.asList(intArray) surprising?
+6. How do two pointers reduce work?
+7. When can sliding window fail with negative values?
+8. How does prefix sum answer a range query in O(1)?
+9. Why must Kadane handle all-negative arrays?
+10. Why does 3Sum take O(n^2) after sorting?
+11. How do you avoid duplicate triplets?
+12. When use a HashMap versus frequency array?
+13. How can integer overflow affect sums and products?
+14. What is the difference between in-place and extra-space solutions?
+15. Which edge cases did you test?
+
+END OF ARRAY NOTES
