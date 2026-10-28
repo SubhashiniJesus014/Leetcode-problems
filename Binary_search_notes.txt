@@ -1,0 +1,692 @@
+BINARY SEARCH — COMPLETE DSA NOTES For Product-Based Company Interviews
+| Java | Beginner-Friendly
+
+============================================================ 1. WHAT IS
+BINARY SEARCH?
+============================================================
+
+Binary Search is an algorithm used to find an element or answer by
+repeatedly eliminating half of the current search range.
+
+Main requirement: - For ordinary binary search on an array, the array
+must be sorted. - Some advanced problems apply the same “eliminate half”
+idea to a monotonic answer space, even when the input array itself is
+not sorted.
+
+Example: nums = [10, 20, 30, 40, 50, 60, 70] target = 50
+
+Check the middle element. - If middle == target, answer found. - If
+target < middle, search the left half. - If target > middle, search the
+right half.
+
+Why is it efficient? A linear search may inspect every element: O(n).
+Binary search roughly halves the search space each step: O(log n).
+
+============================================================ 2.
+COMPLEXITY ============================================================
+
+Ordinary binary search: - Best time: O(1), if the middle element is the
+target immediately. - Average/worst time: O(log n). - Auxiliary space:
+O(1) for the iterative version. - Recursive version: O(log n) auxiliary
+space because of the recursion call stack.
+
+Important distinction: - Input array space is O(n), but auxiliary space
+usually excludes the input. - If you only use start, end, mid, and a few
+variables, auxiliary space is O(1). - If you create another array of
+size n, auxiliary space is O(n).
+
+How many times can we halve n? After k steps, the remaining size is
+approximately n / 2^k. When this becomes 1, k is approximately log2(n).
+Therefore, time complexity is O(log n).
+
+============================================================ 3. THE
+STANDARD ITERATIVE TEMPLATE
+============================================================
+
+Use this for finding an exact target in an ascending sorted array.
+
+class Solution { public int search(int[] nums, int target) { int start =
+0; int end = nums.length - 1;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+
+        return -1;
+    }
+
+}
+
+Why use start + (end - start) / 2 instead of (start + end) / 2? - In
+languages with fixed-size integer types, start + end can overflow for
+very large indices. - The safer expression calculates the midpoint
+without adding both large indices directly.
+
+Why while (start <= end)? - The search interval is inclusive: [start,
+end]. - If start == end, one candidate remains and must still be
+checked. - The loop ends when start > end, meaning no candidates remain.
+
+Why start = mid + 1? - nums[mid] has already been checked. - If
+nums[mid] < target, mid and everything to its left can be discarded.
+
+Why end = mid - 1? - nums[mid] has already been checked. - If
+nums[mid] > target, mid and everything to its right can be discarded.
+
+============================================================ 4. DRY RUN:
+EXACT SEARCH
+============================================================
+
+nums = [2, 5, 8, 12, 16, 23, 38] target = 16
+
+Iteration 1: start = 0, end = 6 mid = 3, nums[mid] = 12 16 > 12, so
+start = mid + 1 = 4
+
+Iteration 2: start = 4, end = 6 mid = 5, nums[mid] = 23 16 < 23, so end
+= mid - 1 = 4
+
+Iteration 3: start = 4, end = 4 mid = 4, nums[mid] = 16 Return 4.
+
+============================================================ 5. COMMON
+BINARY SEARCH BOUNDARY RULES
+============================================================
+
+Template A: Search for an exact element - while (start <= end) - Found:
+return mid - Move right: start = mid + 1 - Move left: end = mid - 1 -
+Not found: return -1
+
+Template B: Find the first position satisfying a monotonic condition -
+Often use while (start < end) or a half-open interval. - If mid might be
+the answer, preserve it with end = mid. - If mid cannot be the answer,
+discard it with start = mid + 1.
+
+A critical question: “Could mid itself still be the answer?” - Yes: use
+end = mid (or another update that keeps mid). - No: use end = mid - 1 or
+start = mid + 1 as appropriate.
+
+Do not mix templates blindly. Decide what the interval means and whether
+its endpoints are inclusive.
+
+============================================================ 6. FIRST
+OCCURRENCE / LOWER BOUND
+============================================================
+
+Problem: Find the first index of target in a sorted array with
+duplicates. Example: [1, 2, 2, 2, 4], target = 2 Answer: 1
+
+Idea: When nums[mid] == target, record mid and keep searching left.
+
+Java: class Solution { public int firstOccurrence(int[] nums, int
+target) { int start = 0; int end = nums.length - 1; int answer = -1;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] == target) {
+                answer = mid;
+                end = mid - 1;
+            } else if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return answer;
+    }
+
+}
+
+Why continue left after finding target? There may be an earlier
+occurrence.
+
+Lower bound definition: The first index i such that nums[i] >= target.
+If no such index exists, the insertion position is nums.length.
+
+Lower bound template: int start = 0, end = nums.length; while (start <
+end) { int mid = start + (end - start) / 2; if (nums[mid] < target) {
+start = mid + 1; } else { end = mid; } } return start;
+
+Notice this uses a half-open interval [start, end), so end begins at
+nums.length and is allowed to equal nums.length.
+
+============================================================ 7. LAST
+OCCURRENCE / UPPER BOUND
+============================================================
+
+Problem: Find the last index of target. Example: [1, 2, 2, 2, 4], target
+= 2 Answer: 3
+
+Java: class Solution { public int lastOccurrence(int[] nums, int target)
+{ int start = 0; int end = nums.length - 1; int answer = -1;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] == target) {
+                answer = mid;
+                start = mid + 1;
+            } else if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return answer;
+    }
+
+}
+
+Upper bound definition: The first index i such that nums[i] > target.
+Count of target in sorted array = upperBound(target) -
+lowerBound(target).
+
+============================================================ 8. COUNT
+OCCURRENCES IN A SORTED ARRAY
+============================================================
+
+Formula: count = lastOccurrence - firstOccurrence + 1 If target does not
+occur, count = 0.
+
+Another formula: count = upperBound(target) - lowerBound(target)
+
+Example: nums = [1, 2, 2, 2, 3, 5], target = 2 lower bound = 1 upper
+bound = 4 count = 4 - 1 = 3
+
+============================================================ 9. SEARCH
+INSERT POSITION
+============================================================
+
+Return the index where target exists or should be inserted to preserve
+sorted order.
+
+Example: nums = [1, 3, 5, 6], target = 2 Answer: 1
+
+Use lower bound: class Solution { public int searchInsert(int[] nums,
+int target) { int start = 0; int end = nums.length;
+
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                end = mid;
+            }
+        }
+        return start;
+    }
+
+}
+
+============================================================ 10. FLOOR
+AND CEILING ============================================================
+
+Floor: The greatest value <= target. In a sorted array, track the last
+element smaller than or equal to target.
+
+Ceiling: The smallest value >= target. This is the lower bound value, if
+lower bound is within the array.
+
+Example: nums = [2, 4, 6, 8], target = 5 Floor = 4 Ceiling = 6
+
+Be clear whether the problem asks for the value or the index.
+
+============================================================ 11. SEARCH
+IN A ROTATED SORTED ARRAY — NO DUPLICATES
+============================================================
+
+Example: [4, 5, 6, 7, 0, 1, 2], target = 0 Answer: index 4
+
+Key observation: At least one half is sorted.
+
+Java: class Solution { public int search(int[] nums, int target) { int
+start = 0; int end = nums.length - 1;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] == target) {
+                return mid;
+            }
+
+            // Left half is sorted
+            if (nums[start] <= nums[mid]) {
+                if (nums[start] <= target && target < nums[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            } else {
+                // Right half is sorted
+                if (nums[mid] < target && target <= nums[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
+
+}
+
+Reasoning: 1. Check mid first. 2. Determine which half is sorted. 3.
+Check whether target lies within that half’s inclusive/exclusive range.
+4. Keep that half if target could be there; otherwise discard it.
+
+Common mistake: Use the correct boundary comparisons: - Left sorted
+target range: nums[start] <= target && target < nums[mid] - Right sorted
+target range: nums[mid] < target && target <= nums[end]
+
+============================================================ 12. SEARCH
+IN ROTATED SORTED ARRAY II — WITH DUPLICATES
+============================================================
+
+Problem allows duplicates and asks whether target exists.
+
+Important ambiguity: nums = [3, 3, 3, 1, 3] When nums[start] ==
+nums[mid] == nums[end], those values do not reveal which side contains
+the rotation.
+
+Java: class Solution { public boolean search(int[] nums, int target) {
+int start = 0; int end = nums.length - 1;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] == target) {
+                return true;
+            }
+
+            if (nums[start] == nums[mid] && nums[mid] == nums[end]) {
+                start++;
+                end--;
+            } else if (nums[start] <= nums[mid]) {
+                if (nums[start] <= target && target < nums[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            } else {
+                if (nums[mid] < target && target <= nums[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return false;
+    }
+
+}
+
+Why shrink both boundaries? The middle was checked and is not the
+target. If start, mid, and end all have the same value, neither boundary
+provides useful information. Moving start forward and end backward
+safely removes those equal-valued boundary candidates.
+
+Complexity: - Typical: O(log n) - Worst case: O(n), e.g. many repeated
+values. - Auxiliary space: O(1)
+
+============================================================ 13. FIND
+MINIMUM IN ROTATED SORTED ARRAY — NO DUPLICATES
+============================================================
+
+Example: [4, 5, 6, 7, 0, 1, 2] Answer: 0
+
+Java: class Solution { public int findMin(int[] nums) { int start = 0;
+int end = nums.length - 1;
+
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] > nums[end]) {
+                start = mid + 1;
+            } else {
+                end = mid;
+            }
+        }
+        return nums[start];
+    }
+
+}
+
+Reasoning: - If nums[mid] > nums[end], the minimum must be to the right
+of mid. - Otherwise, nums[mid] <= nums[end], so the minimum is at mid or
+to its left. - Keep mid by setting end = mid. - Stop when start == end;
+that position contains the minimum.
+
+Why not end = mid - 1 in the second case? Because mid itself could be
+the minimum.
+
+============================================================ 14. FIND
+MINIMUM IN ROTATED SORTED ARRAY II — WITH DUPLICATES
+============================================================
+
+Java: class Solution { public int findMin(int[] nums) { int start = 0;
+int end = nums.length - 1;
+
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] > nums[end]) {
+                start = mid + 1;
+            } else if (nums[mid] < nums[end]) {
+                end = mid;
+            } else {
+                end--;
+            }
+        }
+        return nums[start];
+    }
+
+}
+
+Three cases: 1. nums[mid] > nums[end] Minimum is strictly to the right
+of mid. start = mid + 1
+
+2.  nums[mid] < nums[end] The segment from mid to end is increasing, so
+    mid may be the minimum. end = mid
+
+3.  nums[mid] == nums[end] Cannot identify the correct side from equal
+    values. end– removes one duplicate safely.
+
+Example [3, 1, 3]: - mid value is 1 and end value is 3. - nums[mid] <
+nums[end], so end = mid. - The algorithm keeps the minimum candidate.
+
+Complexity: - Typical: O(log n) - Worst case: O(n) due to duplicates. -
+Auxiliary space: O(1)
+
+============================================================ 15. PEAK
+ELEMENT ============================================================
+
+A peak is an element greater than its neighbours. Depending on the
+problem, edges may be treated as having negative infinity outside the
+array.
+
+Java: class Solution { public int findPeakElement(int[] nums) { int
+start = 0; int end = nums.length - 1;
+
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+
+            if (nums[mid] > nums[mid + 1]) {
+                end = mid;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return start;
+    }
+
+}
+
+Reasoning: - If nums[mid] > nums[mid + 1], a peak exists at mid or to
+its left. - Otherwise, an upward slope exists to the right, so a peak
+exists to the right. - This finds one peak, not necessarily the only
+peak.
+
+============================================================ 16. BINARY
+SEARCH ON ANSWER
+============================================================
+
+Sometimes the array is not sorted, but the possible answers form a range
+and a condition is monotonic.
+
+Monotonic means the condition changes only one way: - false, false,
+false, true, true, true or - true, true, true, false, false, false
+
+General thinking: 1. Define the smallest and largest possible answer. 2.
+Write a function that checks whether a candidate answer works. 3.
+Determine whether a candidate that works means search left or right. 4.
+Find the first true or last true boundary.
+
+Common problems: - Square root of x - Koko Eating Bananas - Minimum days
+to make bouquets - Capacity to ship packages within D days - Split array
+largest sum - Minimum speed to arrive on time - Aggressive Cows /
+maximize minimum distance - Allocate Books / Painter’s Partition
+(problem-specific variants)
+
+============================================================ 17. INTEGER
+SQUARE ROOT ============================================================
+
+Find floor(sqrt(x)) without using a square-root function.
+
+Java: class Solution { public int mySqrt(int x) { int start = 0; int end
+= x; int answer = 0;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            // Use division to avoid mid * mid overflow.
+            if (mid == 0 || mid <= x / mid) {
+                answer = mid;
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return answer;
+    }
+
+}
+
+Important: - Avoid mid * mid when it might overflow an int. - x = 0
+works with this implementation. - Time: O(log x), auxiliary space: O(1).
+
+============================================================ 18. KOKO
+EATING BANANAS — BINARY SEARCH ON ANSWER
+============================================================
+
+Given piles and h hours, find the minimum integer eating speed k that
+finishes all piles within h hours.
+
+Check function: Hours needed for a pile p = ceil(p / k). For integer
+arithmetic, ceil(p / k) = (p + k - 1) / k, but this addition can
+overflow for very large values. A safe expression is p / k + (p % k == 0
+? 0 : 1).
+
+Reasoning: - If speed k works, any greater speed also works. - If speed
+k fails, any smaller speed also fails. - This is a monotonic predicate,
+so binary search the minimum feasible speed. - Lower bound: 1. - Upper
+bound: maximum pile size.
+
+Pseudo: start = 1 end = max(piles) answer = end while start <= end: mid
+= start + (end - start) / 2 if canFinish(mid): answer = mid end = mid -
+1 else: start = mid + 1
+
+============================================================ 19. SHIP
+PACKAGES WITHIN D DAYS
+============================================================
+
+Find the minimum ship capacity to deliver packages in order within D
+days.
+
+Search range: - Minimum capacity = maximum package weight. - Maximum
+capacity = sum of all package weights.
+
+Feasibility check for a capacity: - Start with one day and current load
+zero. - Add weights while the capacity is not exceeded. - When the next
+weight would exceed capacity, start a new day. - If required days <= D,
+capacity is feasible.
+
+Monotonicity: - A larger capacity never needs more days than a smaller
+capacity. - Find the first capacity that is feasible.
+
+Watch out: - Use long when summing weights if constraints can exceed
+int. - Follow the exact problem’s required return type.
+
+============================================================ 20. BINARY
+SEARCH IN A 2D MATRIX
+============================================================
+
+There are different matrix problem types. Do not confuse them.
+
+Type A: Every row is sorted, and the first element of each row is
+greater than the last element of the previous row. Treat the matrix as
+one sorted 1D array of length rows * cols. For index mid: row = mid /
+cols col = mid % cols
+
+Type B: Every row is sorted, but row ranges may overlap. Binary-search
+each row, or use a problem-specific strategy.
+
+Type C: Rows and columns are individually sorted. A common method starts
+at the top-right: - If value == target, found. - If value > target, move
+left. - If value < target, move down. This takes O(rows + cols).
+
+Always read the matrix’s exact sorted-order guarantee before choosing an
+algorithm.
+
+============================================================ 21. COMMON
+JAVA IMPLEMENTATION MISTAKES
+============================================================
+
+1.  Wrong loop condition
+
+-   Exact search with inclusive endpoints: while (start <= end).
+-   Search for a boundary with end = mid often uses while (start < end).
+-   Choose based on the interval invariant.
+
+2.  Infinite loop Incorrect: if (nums[mid] < target) start = mid; When
+    start == mid, this may not progress. Usually use start = mid + 1
+    when mid is eliminated.
+
+3.  Discarding a possible answer For minimum search, if mid may be the
+    minimum, use end = mid, not end = mid - 1.
+
+4.  Midpoint overflow Prefer: mid = start + (end - start) / 2;
+
+5.  Duplicates in rotated arrays Equality can hide which half is sorted.
+    Handle the ambiguous case explicitly.
+
+6.  Incorrect comparisons Use <= or < according to whether a boundary is
+    included. Write down the interval meaning before coding.
+
+7.  Wrong return value Exact search usually returns -1 when absent.
+    Boolean search returns false. Minimum search returns nums[start]
+    after start == end. Insertion position returns the boundary index.
+
+8.  Empty input Check whether the problem guarantees a non-empty array.
+    If it does not, handle nums.length == 0 before accessing elements.
+
+9.  Integer overflow in answer-space problems Sums, products, and bounds
+    may need long. Avoid mid * mid in square-root solutions when
+    overflow is possible.
+
+10. Assuming all binary search is O(log n) Duplicates can cause O(n)
+    worst-case behavior in rotated-array search. A feasibility function
+    can cost O(n), making total complexity O(n log range).
+
+============================================================ 22. HOW TO
+RECOGNIZE A BINARY SEARCH PROBLEM
+============================================================
+
+Look for these clues: - Sorted array or sorted list. - Need first/last
+occurrence, lower bound, upper bound, or insertion position. - Rotated
+sorted array. - Find minimum/maximum in a structured sorted array. -
+Need to minimize the maximum or maximize the minimum. - There is a
+monotonic yes/no feasibility check. - Brute force tries every candidate
+answer in a large numeric range.
+
+Ask: 1. Is the search space sorted or monotonic? 2. What exactly does
+start/end represent? 3. What evidence lets me discard half? 4. Could mid
+itself still be the answer? 5. Is the answer a value, index, count, or
+boolean? 6. What are the edge cases?
+
+============================================================ 23.
+PRODUCT-BASED COMPANY INTERVIEW CHECKLIST
+============================================================
+
+You should be able to explain and implement these without looking at
+notes:
+
+FOUNDATIONS [ ] Exact binary search [ ] Iterative vs recursive binary
+search [ ] First occurrence [ ] Last occurrence [ ] Lower bound and
+upper bound [ ] Count occurrences [ ] Search insert position [ ] Floor
+and ceiling
+
+ROTATED ARRAYS AND STRUCTURED ARRAYS [ ] Search in rotated sorted array
+(no duplicates) [ ] Search in rotated sorted array II (duplicates) [ ]
+Find minimum in rotated sorted array [ ] Find minimum in rotated sorted
+array II [ ] Find rotation count / pivot [ ] Find peak element [ ]
+Search in a 2D matrix [ ] Search in a row/column sorted matrix
+
+BINARY SEARCH ON ANSWER [ ] Integer square root [ ] Koko Eating Bananas
+[ ] Capacity to Ship Packages Within D Days [ ] Minimum Days to Make M
+Bouquets [ ] Split Array Largest Sum [ ] Minimum Speed to Arrive on Time
+[ ] Aggressive Cows / maximize minimum distance [ ] Allocate Books /
+Painter’s Partition variants
+
+For every problem, practise: [ ] Explain the brute-force approach first.
+[ ] Explain why binary search applies. [ ] State the search-space
+boundaries. [ ] Define the condition that moves start or end. [ ] Test a
+normal case, boundary case, duplicates if relevant, and no-answer case.
+[ ] State time and auxiliary-space complexity. [ ] Write the code
+without copying.
+
+============================================================ 24.
+PRACTICE ORDER
+============================================================
+
+Beginner: 1. Binary Search 2. Search Insert Position 3. First and Last
+Position of Element in Sorted Array 4. Find First and Last Occurrence /
+Count Occurrences 5. Sqrt(x) 6. Valid Perfect Square
+
+Intermediate: 7. Search in Rotated Sorted Array 8. Find Minimum in
+Rotated Sorted Array 9. Search in Rotated Sorted Array II 10. Find
+Minimum in Rotated Sorted Array II 11. Find Peak Element 12. Find Single
+Element in a Sorted Array 13. Search a 2D Matrix 14. Find the Smallest
+Divisor Given a Threshold
+
+Binary search on answer: 15. Koko Eating Bananas 16. Capacity to Ship
+Packages Within D Days 17. Minimum Days to Make M Bouquets 18. Split
+Array Largest Sum 19. Aggressive Cows 20. Median of Two Sorted Arrays
+(advanced; learn partition reasoning carefully)
+
+============================================================ 25. FINAL
+QUICK REVISION SHEET
+============================================================
+
+Exact target: while (start <= end) if equal: return mid if nums[mid] <
+target: start = mid + 1 else: end = mid - 1
+
+First occurrence: if equal: save answer; end = mid - 1
+
+Last occurrence: if equal: save answer; start = mid + 1
+
+Lower bound (first >= target): while (start < end) if nums[mid] <
+target: start = mid + 1 else: end = mid
+
+Rotated search without duplicates: Identify the sorted half, then check
+whether target is in its range.
+
+Rotated search with duplicates: If start, mid, and end values are all
+equal, shrink both boundaries. Worst case can be O(n).
+
+Minimum in rotated array without duplicates: if nums[mid] > nums[end]:
+start = mid + 1 else: end = mid
+
+Minimum in rotated array with duplicates: if nums[mid] > nums[end]:
+start = mid + 1 else if nums[mid] < nums[end]: end = mid else: end–
+
+Binary search on answer: Define a monotonic feasibility function. For
+minimum feasible answer: if feasible(mid): save answer; end = mid - 1
+else: start = mid + 1
+
+Complexities: - Ordinary binary search: O(log n) time, O(1) auxiliary
+space (iterative). - Recursive binary search: O(log n) auxiliary
+call-stack space. - Rotated array with duplicates: worst-case O(n). -
+Binary search on answer: O(number of feasibility checks × cost of one
+check).
+
+MOST IMPORTANT INTERVIEW HABIT: Do not memorize updates without
+understanding them. Ask: “Can the answer still be at mid?” - If yes,
+preserve mid. - If no, discard mid. Then prove why the discarded region
+cannot contain the answer.
