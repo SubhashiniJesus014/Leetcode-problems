@@ -1,0 +1,1150 @@
+COMPLETE DSA NOTES: LINKED LISTS Product-Based Company / SDE-1 Interview
+Preparation Language: Java
+
+============================================================ 1. WHAT IS
+A LINKED LIST?
+============================================================
+
+A Linked List is a linear data structure in which elements (called
+nodes) are stored at different memory locations. Each node stores: 1.
+Data 2. A reference (link) to the next node
+
+Unlike arrays, linked-list elements are not required to occupy
+contiguous memory.
+
+Example: 10 -> 20 -> 30 -> 40 -> null
+
+Here: - 10 is the head node. - 40 is the tail node. - null means there
+is no next node. - head is the entry point to the list.
+
+WHY USE A LINKED LIST? - Dynamic size: it can grow or shrink at
+runtime. - Insertions/deletions can be efficient when the node
+position/reference is known. - It does not require a contiguous block of
+memory.
+
+LIMITATIONS - No direct indexing: accessing the 5th element requires
+traversal. - Extra memory is needed for references. - Poorer cache
+locality than arrays in many practical situations. - Pointer/reference
+mistakes can break the list.
+
+ARRAY VS LINKED LIST
+
+Array: - Usually contiguous memory. - Access by index: O(1). -
+Insert/delete in the middle: O(n), due to shifting. - Search in an
+unsorted array: O(n).
+
+Singly Linked List: - Nodes can be in separate memory locations. -
+Access by position: O(n). - Insert at head: O(1). - Delete at head:
+O(1). - Search by value: O(n).
+
+Important interview point: A linked list does NOT make every insertion
+or deletion O(1). It is O(1) only when you already have the required
+node/reference (and, for some operations, the predecessor or list
+metadata). Finding that position can still cost O(n).
+
+============================================================ 2. TYPES OF
+LINKED LISTS
+============================================================
+
+A. SINGLY LINKED LIST Each node points to the next node.
+
+10 -> 20 -> 30 -> null
+
+Node structure: class Node { int data; Node next;
+
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+
+}
+
+B. DOUBLY LINKED LIST Each node points to both the previous and next
+nodes.
+
+null <- 10 <-> 20 <-> 30 -> null
+
+class DoublyNode { int data; DoublyNode prev; DoublyNode next;
+
+    DoublyNode(int data) {
+        this.data = data;
+    }
+
+}
+
+Advantages: - Can traverse in both directions. - Given a node, deletion
+can be O(1) if links are updated correctly. Disadvantages: - Extra
+memory for prev. - More link updates, so more chances of mistakes.
+
+C. CIRCULAR SINGLY LINKED LIST The last node points back to the head.
+
+10 -> 20 -> 30 ^ | |___________|
+
+There is no null at the end. Stop traversal when you reach the starting
+node again, not when current becomes null.
+
+D. CIRCULAR DOUBLY LINKED LIST Each node has prev and next links;
+tail.next = head and head.prev = tail.
+
+============================================================ 3. CORE TERMINOLOGY ============================================================
+
+head: Reference to the first node. tail: Reference to the last node, if
+maintained. current: Node currently being visited. next: Reference to
+the next node. prev: Reference to the previous node. null: No
+node/reference. dummy (sentinel) node: A helper node placed before the
+actual head to simplify edge cases such as inserting/deleting the first
+node.
+
+Example: dummy -> 10 -> 20 -> 30 -> null ^ actual head = dummy.next
+
+============================================================ 4. BASIC OPERATIONS AND COMPLEXITIES ============================================================
+
+Operation Singly Linked List Access by index O(n) Search by value O(n)
+Insert at head O(1) Insert at tail (tail maintained) O(1) Insert at tail
+(no tail) O(n) Delete head O(1) Delete tail O(n) Insert after a known
+node O(1) Delete after a known predecessor O(1)
+
+Space for n nodes: O(n).
+
+For a doubly linked list with head and tail: - Insert/delete at either
+end: O(1). - Delete a known node: O(1). - Search/access by position:
+O(n).
+
+============================================================ 5. JAVA IMPLEMENTATION: SINGLY LINKED LIST ============================================================
+
+class Node { int data; Node next;
+
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+
+}
+
+class MyLinkedList { Node head;
+
+    // Insert at the beginning
+    void insertAtHead(int value) {
+        Node newNode = new Node(value);
+        newNode.next = head;
+        head = newNode;
+    }
+
+    // Insert at the end
+    void insertAtTail(int value) {
+        Node newNode = new Node(value);
+
+        if (head == null) {
+            head = newNode;
+            return;
+        }
+
+        Node current = head;
+        while (current.next != null) {
+            current = current.next;
+        }
+        current.next = newNode;
+    }
+
+    // Display the list
+    void display() {
+        Node current = head;
+
+        while (current != null) {
+            System.out.print(current.data + " -> ");
+            current = current.next;
+        }
+        System.out.println("null");
+    }
+
+    // Search for a value
+    boolean search(int target) {
+        Node current = head;
+
+        while (current != null) {
+            if (current.data == target) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+
+    // Delete the first occurrence of a value
+    void deleteValue(int value) {
+        if (head == null) {
+            return;
+        }
+
+        if (head.data == value) {
+            head = head.next;
+            return;
+        }
+
+        Node current = head;
+        while (current.next != null && current.next.data != value) {
+            current = current.next;
+        }
+
+        if (current.next != null) {
+            current.next = current.next.next;
+        }
+    }
+
+}
+
+============================================================ 6.TRAVERSAL ============================================================
+
+To visit every node, start at head and repeatedly follow next until
+null.
+
+void printList(Node head) { Node current = head;
+
+    while (current != null) {
+        System.out.println(current.data);
+        current = current.next;
+    }
+
+}
+
+Time: O(n) Extra space: O(1)
+
+Common mistake: Do not move head itself while traversing if you still
+need the original head. Use a temporary pointer such as current.
+
+============================================================ 7.INSERTION PATTERNS ============================================================
+
+A. INSERT AT HEAD
+
+Before: head -> 20 -> 30 -> null
+
+After inserting 10: head -> 10 -> 20 -> 30 -> null
+
+Code: Node newNode = new Node(10); newNode.next = head; head = newNode;
+
+Order matters: connect newNode to the old head before updating head.
+
+B. INSERT AT TAIL
+
+If list is empty: head = newNode;
+
+Otherwise traverse to the last node: Node current = head; while
+(current.next != null) { current = current.next; } current.next =
+newNode;
+
+Time: O(n) without a tail reference; O(1) with a maintained tail.
+
+C. INSERT AT A ZERO-BASED POSITION
+
+Assume position 0 means insert before the current head.
+
+Node insertAtPosition(Node head, int position, int value) { Node newNode
+= new Node(value);
+
+    if (position == 0) {
+        newNode.next = head;
+        return newNode;
+    }
+
+    Node current = head;
+    for (int i = 0; i < position - 1 && current != null; i++) {
+        current = current.next;
+    }
+
+    if (current == null) {
+        return head; // Invalid position in this example
+    }
+
+    newNode.next = current.next;
+    current.next = newNode;
+    return head;
+
+}
+
+Time: O(n), extra space: O(1).
+
+============================================================ 8. DELETION PATTERNS ============================================================
+
+A. DELETE HEAD
+
+if (head != null) { head = head.next; }
+
+Time: O(1).
+
+B. DELETE A VALUE (FIRST OCCURRENCE)
+
+Node deleteValue(Node head, int value) { if (head == null) { return
+null; }
+
+    if (head.data == value) {
+        return head.next;
+    }
+
+    Node current = head;
+    while (current.next != null && current.next.data != value) {
+        current = current.next;
+    }
+
+    if (current.next != null) {
+        current.next = current.next.next;
+    }
+
+    return head;
+
+}
+
+Time: O(n), extra space: O(1).
+
+C. DELETE AT A ZERO-BASED POSITION
+
+Node deleteAtPosition(Node head, int position) { if (head == null ||
+position < 0) { return head; }
+
+    if (position == 0) {
+        return head.next;
+    }
+
+    Node current = head;
+    for (int i = 0; i < position - 1 && current.next != null; i++) {
+        current = current.next;
+    }
+
+    if (current.next != null) {
+        current.next = current.next.next;
+    }
+
+    return head;
+
+}
+
+D. DELETE LAST NODE
+
+-   Empty list: nothing to delete.
+-   One node: set head = null.
+-   Otherwise stop at the second-last node and set its next = null.
+
+Node deleteLast(Node head) { if (head == null || head.next == null) {
+return null; }
+
+    Node current = head;
+    while (current.next.next != null) {
+        current = current.next;
+    }
+
+    current.next = null;
+    return head;
+
+}
+
+============================================================ 9. THE MOST IMPORTANT LINKED-LIST INTERVIEW PATTERNS ============================================================
+
+Pattern 1: TWO POINTERS (SLOW AND FAST) - slow moves one node at a
+time. - fast moves two nodes at a time. Used for: - Finding the middle
+node. - Detecting a cycle. - Finding the start of a cycle. - Checking
+whether a list is a palindrome (with additional reversal logic).
+
+Pattern 2: REVERSAL - Maintain prev, current, and next. Used for: -
+Reverse a linked list. - Reverse a sub-list. - Reverse nodes in
+groups. - Palindrome checking.
+
+Pattern 3: DUMMY NODE - Create a helper node before head. Used for: -
+Removing nodes. - Merging sorted lists. - Inserting nodes while building
+a result. - Avoiding special handling of the first node.
+
+Pattern 4: POINTER REWIRING - Change next references without creating
+new data nodes. Used for: - Reordering a list. - Swapping pairs. -
+Merging lists. - Partitioning a list.
+
+Pattern 5: HASHING - Store node references in a HashSet or HashMap. Used
+for: - Detecting a cycle. - Finding repeated node references. - Tracking
+visited nodes. Usually uses O(n) extra space.
+
+Pattern 6: RECURSION - Solve a smaller list and connect the current
+node. Used for: - Recursive reversal. - Merge two sorted lists. - Some
+group-reversal solutions. Watch recursion stack space: usually O(n) for
+a list of n nodes.
+
+============================================================ 10. FIND THE MIDDLE OF A LINKED LIST ============================================================
+
+Problem: Return the middle node of a singly linked list.
+
+Approach: Slow and fast pointers. - slow moves one step. - fast moves
+two steps. - When fast reaches the end, slow is at the middle.
+
+Java: class Solution { public ListNode middleNode(ListNode head) {
+ListNode slow = head; ListNode fast = head;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        return slow;
+    }
+
+}
+
+Time: O(n) Space: O(1)
+
+For an even-length list, this returns the SECOND middle node. Example: 1
+-> 2 -> 3 -> 4 -> 5 -> 6 returns node 4.
+
+Interview tip: The loop condition must check fast != null before
+fast.next. Otherwise a NullPointerException may occur.
+
+============================================================ 11. REVERSE A LINKED LIST (ITERATIVE) ============================================================
+
+Original: 1 -> 2 -> 3 -> null
+
+Reversed: 3 -> 2 -> 1 -> null
+
+Three pointers: prev = null current = head next = current.next
+
+For each node: 1. Save current.next in next. 2. Point current.next to
+prev. 3. Move prev to current. 4. Move current to next.
+
+Java: class Solution { public ListNode reverseList(ListNode head) {
+ListNode prev = null; ListNode current = head;
+
+        while (current != null) {
+            ListNode next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+
+        return prev;
+    }
+
+}
+
+Time: O(n) Space: O(1)
+
+Important: Return prev, not current. At loop completion current is null
+and prev is the new head.
+
+Recursive version: ListNode reverseList(ListNode head) { if (head ==
+null || head.next == null) { return head; }
+
+    ListNode newHead = reverseList(head.next);
+    head.next.next = head;
+    head.next = null;
+
+    return newHead;
+
+}
+
+Time: O(n) Call-stack space: O(n).
+
+============================================================ 12. DETECT A CYCLE IN A LINKED LIST ============================================================
+
+A cycle exists when a node’s next reference eventually points to a node
+that was already visited.
+
+Example: 1 -> 2 -> 3 -> 4 ^ | |_________|
+
+Approach 1: HashSet - Visit each node. - If the node is already in the
+set, a cycle exists. Time: O(n), Space: O(n).
+
+Approach 2: Floyd’s Cycle Detection (Tortoise and Hare) - slow moves one
+step. - fast moves two steps. - If they meet, a cycle exists. - If fast
+or fast.next becomes null, there is no cycle.
+
+Java: public boolean hasCycle(ListNode head) { ListNode slow = head;
+ListNode fast = head;
+
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+
+        if (slow == fast) {
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
+Time: O(n) Space: O(1)
+
+Important: Compare node references using ==, not node values. Two
+different nodes can contain the same value.
+
+============================================================ 13. FIND THE START OF THE CYCLE ============================================================
+
+Steps: 1. Use slow and fast pointers to find a meeting point inside the
+cycle. 2. If no meeting occurs, return null. 3. Move one pointer to
+head. 4. Move both pointers one step at a time. 5. Their next meeting
+point is the cycle’s starting node.
+
+Java: public ListNode detectCycle(ListNode head) { ListNode slow = head;
+ListNode fast = head;
+
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+
+        if (slow == fast) {
+            ListNode first = head;
+
+            while (first != slow) {
+                first = first.next;
+                slow = slow.next;
+            }
+
+            return first;
+        }
+    }
+
+    return null;
+
+}
+
+Time: O(n) Space: O(1)
+
+============================================================ 14. REMOVE THE NTH NODE FROM THE END ============================================================
+
+Example: 1 -> 2 -> 3 -> 4 -> 5, n = 2 Result: 1 -> 2 -> 3 -> 5
+
+Use a dummy node and two pointers. 1. Set slow and fast to dummy. 2.
+Move fast n + 1 steps. 3. Move both until fast becomes null. 4. slow is
+immediately before the node to delete. 5. Skip the target node.
+
+Java: public ListNode removeNthFromEnd(ListNode head, int n) { ListNode
+dummy = new ListNode(0); dummy.next = head;
+
+    ListNode slow = dummy;
+    ListNode fast = dummy;
+
+    for (int i = 0; i <= n; i++) {
+        fast = fast.next;
+    }
+
+    while (fast != null) {
+        slow = slow.next;
+        fast = fast.next;
+    }
+
+    slow.next = slow.next.next;
+    return dummy.next;
+
+}
+
+Time: O(n) Space: O(1)
+
+Assumption: n is valid (1 <= n <= list length). In production code,
+validate input if the problem does not guarantee this.
+
+============================================================ 15. MERGE TWO SORTED LINKED LISTS 
+
+
+============================================================
+
+Example: 1 -> 3 -> 5 2 -> 4 -> 6
+
+Result: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+
+Use a dummy node and a tail pointer. At each step, attach the smaller
+current node to tail.
+
+Java: public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+ListNode dummy = new ListNode(0); ListNode tail = dummy;
+
+    while (list1 != null && list2 != null) {
+        if (list1.val <= list2.val) {
+            tail.next = list1;
+            list1 = list1.next;
+        } else {
+            tail.next = list2;
+            list2 = list2.next;
+        }
+        tail = tail.next;
+    }
+
+    if (list1 != null) {
+        tail.next = list1;
+    } else {
+        tail.next = list2;
+    }
+
+    return dummy.next;
+
+}
+
+Time: O(n + m) Extra space: O(1) when reusing existing nodes.
+
+============================================================ 16. CHECK
+WHETHER A LINKED LIST IS A PALINDROME
+============================================================
+
+A palindrome reads the same forward and backward. Examples: 1 -> 2 -> 2
+-> 1 is a palindrome. 1 -> 2 -> 3 is not a palindrome.
+
+Efficient approach: 1. Find the middle using slow and fast pointers. 2.
+Reverse the second half. 3. Compare first half and reversed second half.
+4. Optionally restore the list if the problem expects no mutation.
+
+Java: public boolean isPalindrome(ListNode head) { if (head == null ||
+head.next == null) { return true; }
+
+    ListNode slow = head;
+    ListNode fast = head;
+
+    while (fast.next != null && fast.next.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    ListNode second = reverseList(slow.next);
+    ListNode first = head;
+    ListNode temp = second;
+
+    boolean result = true;
+
+    while (temp != null) {
+        if (first.val != temp.val) {
+            result = false;
+            break;
+        }
+        first = first.next;
+        temp = temp.next;
+    }
+
+    slow.next = reverseList(second); // Restore original list
+    return result;
+
+}
+
+Time: O(n) Extra space: O(1), excluding helper call stack if iterative
+reversal is used.
+
+============================================================ 17.
+INTERSECTION OF TWO LINKED LISTS
+============================================================
+
+Two lists intersect when they share the SAME node reference, not merely
+a node with the same value.
+
+Approach: Two pointers. - Pointer A traverses list A, then list B. -
+Pointer B traverses list B, then list A. - If they intersect, they meet
+at the intersection node. - If there is no intersection, both eventually
+become null.
+
+Java: public ListNode getIntersectionNode(ListNode headA, ListNode
+headB) { ListNode a = headA; ListNode b = headB;
+
+    while (a != b) {
+        a = (a == null) ? headB : a.next;
+        b = (b == null) ? headA : b.next;
+    }
+
+    return a;
+
+}
+
+Time: O(n + m) Space: O(1)
+
+============================================================ 18. ADD TWO
+NUMBERS REPRESENTED BY LINKED LISTS
+============================================================
+
+Digits are stored in reverse order. Example: 2 -> 4 -> 3 represents 342.
+5 -> 6 -> 4 represents 465. Output: 7 -> 0 -> 8 represents 807.
+
+Use: - carry to store overflow. - dummy node to build the answer. -
+Continue while either list has nodes or carry is nonzero.
+
+Java: public ListNode addTwoNumbers(ListNode l1, ListNode l2) { ListNode
+dummy = new ListNode(0); ListNode current = dummy; int carry = 0;
+
+    while (l1 != null || l2 != null || carry != 0) {
+        int sum = carry;
+
+        if (l1 != null) {
+            sum += l1.val;
+            l1 = l1.next;
+        }
+
+        if (l2 != null) {
+            sum += l2.val;
+            l2 = l2.next;
+        }
+
+        carry = sum / 10;
+        current.next = new ListNode(sum % 10);
+        current = current.next;
+    }
+
+    return dummy.next;
+
+}
+
+Time: O(max(n, m)) Space: O(max(n, m)) for the output list.
+
+============================================================ 19. REORDER
+LIST ============================================================
+
+Input: 1 -> 2 -> 3 -> 4 -> 5
+
+Output: 1 -> 5 -> 2 -> 4 -> 3
+
+Three stages: 1. Find the middle. 2. Reverse the second half. 3. Merge
+the two halves alternately.
+
+Java: public void reorderList(ListNode head) { if (head == null ||
+head.next == null) { return; }
+
+    ListNode slow = head;
+    ListNode fast = head;
+
+    while (fast.next != null && fast.next.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    ListNode second = reverseList(slow.next);
+    slow.next = null;
+
+    ListNode first = head;
+
+    while (second != null) {
+        ListNode firstNext = first.next;
+        ListNode secondNext = second.next;
+
+        first.next = second;
+        second.next = firstNext;
+
+        first = firstNext;
+        second = secondNext;
+    }
+
+}
+
+Time: O(n) Space: O(1)
+
+============================================================ 20. SWAP
+NODES IN PAIRS
+============================================================
+
+Input: 1 -> 2 -> 3 -> 4
+
+Output: 2 -> 1 -> 4 -> 3
+
+Use a dummy node and rewire two nodes at a time.
+
+Java: public ListNode swapPairs(ListNode head) { ListNode dummy = new
+ListNode(0); dummy.next = head; ListNode current = dummy;
+
+    while (current.next != null && current.next.next != null) {
+        ListNode first = current.next;
+        ListNode second = first.next;
+
+        first.next = second.next;
+        second.next = first;
+        current.next = second;
+
+        current = first;
+    }
+
+    return dummy.next;
+
+}
+
+Time: O(n) Space: O(1)
+
+============================================================ 21. REVERSE
+NODES IN K-GROUP
+============================================================
+
+Example: Input: 1 -> 2 -> 3 -> 4 -> 5, k = 2 Output: 2 -> 1 -> 4 -> 3 ->
+5
+
+Only reverse a group if it contains k nodes. Leave the remaining shorter
+group unchanged.
+
+High-level approach: 1. Use a dummy node. 2. Find the kth node from the
+group predecessor. 3. If fewer than k nodes remain, stop. 4. Save the
+node after the group. 5. Reverse pointers within the group. 6. Connect
+the reversed group to the previous and next parts. 7. Continue with the
+next group.
+
+This is an advanced pointer-rewiring problem. Draw the links before
+coding.
+
+Time: O(n) Space: O(1) for an iterative implementation.
+
+============================================================ 22. SORT
+LIST USING MERGE SORT
+============================================================
+
+Why merge sort? - Linked lists do not support efficient random access. -
+Merge sort can split a list with slow/fast pointers. - Merging two
+sorted lists can be done by changing links.
+
+Steps: 1. Base case: zero or one node. 2. Find middle. 3. Split list
+into two halves. 4. Recursively sort each half. 5. Merge the sorted
+halves.
+
+Time: O(n log n) Space: O(log n) recursion stack for the usual recursive
+implementation.
+
+Interview point: Merge sort is generally preferred over array-style
+quicksort for linked lists because merging does not require random
+access.
+
+============================================================ 23. REMOVE
+DUPLICATES FROM A SORTED LIST
+============================================================
+
+Input: 1 -> 1 -> 2 -> 3 -> 3 Output: 1 -> 2 -> 3
+
+Because the list is sorted, duplicates are adjacent.
+
+Java: public ListNode deleteDuplicates(ListNode head) { ListNode current
+= head;
+
+    while (current != null && current.next != null) {
+        if (current.val == current.next.val) {
+            current.next = current.next.next;
+        } else {
+            current = current.next;
+        }
+    }
+
+    return head;
+
+}
+
+Time: O(n) Space: O(1)
+
+============================================================ 24. REMOVE
+ALL VALUES THAT OCCUR MORE THAN ONCE
+============================================================
+
+For a sorted list: 1 -> 2 -> 3 -> 3 -> 4 -> 4 -> 5 Result: 1 -> 2 -> 5
+
+Use a dummy node because the head itself may need to be removed. Keep
+prev at the last confirmed unique node.
+
+Java: public ListNode deleteDuplicatesAll(ListNode head) { ListNode
+dummy = new ListNode(0); dummy.next = head;
+
+    ListNode prev = dummy;
+    ListNode current = head;
+
+    while (current != null) {
+        if (current.next != null && current.val == current.next.val) {
+            int duplicate = current.val;
+
+            while (current != null && current.val == duplicate) {
+                current = current.next;
+            }
+
+            prev.next = current;
+        } else {
+            prev = current;
+            current = current.next;
+        }
+    }
+
+    return dummy.next;
+
+}
+
+Time: O(n) Space: O(1)
+
+============================================================ 25.
+PARTITION LIST AROUND A VALUE
+============================================================
+
+Example: Input: 1 -> 4 -> 3 -> 2 -> 5 -> 2, x = 3 Output: 1 -> 2 -> 2 ->
+4 -> 3 -> 5
+
+Build two lists: - nodes with values less than x - nodes with values
+greater than or equal to x
+
+Join them at the end. Use dummy nodes for both lists.
+
+Time: O(n) Space: O(1) extra if existing nodes are reused.
+
+Be careful to terminate the greater/equal list to avoid accidentally
+retaining old links or creating a cycle.
+
+============================================================ 26. DOUBLY
+LINKED LIST: INSERTION AND DELETION
+============================================================
+
+Node: class DNode { int data; DNode prev; DNode next;
+
+    DNode(int data) {
+        this.data = data;
+    }
+
+}
+
+Insert after a known node current: DNode newNode = new DNode(value);
+
+newNode.next = current.next; newNode.prev = current;
+
+if (current.next != null) { current.next.prev = newNode; }
+
+current.next = newNode;
+
+Delete a known node node: if (node.prev != null) { node.prev.next =
+node.next; }
+
+if (node.next != null) { node.next.prev = node.prev; }
+
+If maintaining head and tail, update them when deleting the first or
+last node. In real code, also handle an empty list and a node that is
+not in the list.
+
+============================================================ 27. COMMON
+INTERVIEW EDGE CASES
+============================================================
+
+Always test: 1. head == null (empty list). 2. One-node list. 3. Two-node
+list. 4. Odd number of nodes. 5. Even number of nodes. 6. Target is at
+the head. 7. Target is at the tail. 8. Target does not exist. 9.
+Duplicate values. 10. All values are the same. 11. n equals list length.
+12. Cycle exists / cycle does not exist. 13. Lists do not intersect. 14.
+One input list is empty. 15. Both input lists are empty.
+
+A very common bug is forgetting to return the updated head after
+deleting or inserting at the beginning.
+
+============================================================ 28. COMMON
+LINKED-LIST CODING MISTAKES
+============================================================
+
+1.  Losing the remaining list: Wrong: current.next = prev; current =
+    current.next;
+
+    This moves current backward after changing the link. Save next
+    first.
+
+2.  Returning current after iterative reversal: current is null at the
+    end. Return prev.
+
+3.  Forgetting head changes: Deleting the head or inserting at the head
+    requires returning/updating head.
+
+4.  Incorrect null checks: Check fast != null && fast.next != null
+    before moving fast by two steps.
+
+5.  Comparing values instead of references: Cycle and intersection
+    problems require node identity/reference comparison.
+
+6.  Not using a dummy node: Head deletion/insertion edge cases become
+    harder.
+
+7.  Creating a cycle accidentally: When rearranging nodes, ensure the
+    final tail points to null when required.
+
+8.  Moving the original head during traversal: Use a temporary pointer.
+
+9.  Incorrect loop boundary: For insertion/deletion by index, carefully
+    define whether positions are zero-based or one-based.
+
+10. Forgetting to reconnect the reversed sub-list: Save the nodes before
+    changing their next references.
+
+============================================================ 29. LINKED
+LIST COMPLEXITY CHEAT SHEET
+============================================================
+
+Operation / Algorithm Time Extra Space Traverse O(n) O(1) Search O(n)
+O(1) Insert at head O(1) O(1) Insert at tail, no tail pointer O(n) O(1)
+Insert at tail, tail pointer O(1) O(1) Delete head O(1) O(1) Delete by
+value O(n) O(1) Find middle O(n) O(1) Reverse iteratively O(n) O(1)
+Reverse recursively O(n) O(n) stack Cycle detection, Floyd O(n) O(1)
+Cycle detection, HashSet O(n) O(n) Find cycle entry O(n) O(1) Remove nth
+from end O(n) O(1) Merge two sorted lists O(n + m) O(1) Palindrome check
+(reversal approach) O(n) O(1) Intersection, two pointers O(n + m) O(1)
+Add two numbers O(max(n,m)) O(max(n,m)) output Reorder list O(n) O(1)
+Swap pairs O(n) O(1) Merge sort O(n log n) O(log n) stack
+
+Note: Output storage is usually reported separately from auxiliary
+space. Complexity can vary by implementation.
+
+============================================================ 30.
+MUST-SOLVE LINKED LIST PROBLEMS FOR SDE-1
+============================================================
+
+LEVEL 1: FUNDAMENTALS 1. Design Linked List 2. Insert a node at a given
+position 3. Delete a node by value 4. Reverse Linked List 5. Middle of
+the Linked List 6. Linked List Cycle 7. Merge Two Sorted Lists 8. Remove
+Duplicates from Sorted List
+
+LEVEL 2: IMPORTANT MEDIUM PROBLEMS 9. Remove Nth Node From End of List
+10. Linked List Cycle II 11. Palindrome Linked List 12. Intersection of
+Two Linked Lists 13. Add Two Numbers 14. Odd Even Linked List 15. Swap
+Nodes in Pairs 16. Rotate List 17. Partition List 18. Reorder List 19.
+Delete Node in a Linked List 20. Remove Linked List Elements
+
+LEVEL 3: ADVANCED / HIGH-VALUE 21. Reverse Linked List II 22. Reverse
+Nodes in k-Group 23. Sort List 24. Merge k Sorted Lists 25. Copy List
+with Random Pointer 26. LRU Cache 27. Flatten a Multilevel Doubly Linked
+List 28. Design Browser History (linked-list concept may be discussed,
+though a doubly linked list is one possible implementation)
+
+Suggested practice platforms: - LeetCode - GeeksforGeeks -
+InterviewBit - HackerRank
+
+Search by the exact problem title. Problem availability and numbering
+can vary.
+
+============================================================ 31. LRU
+CACHE: IMPORTANT DESIGN PROBLEM
+============================================================
+
+LRU means Least Recently Used.
+
+Requirement: - get(key): return value if key exists; otherwise -1. -
+put(key, value): insert/update a key. - When capacity is exceeded,
+remove the least recently used key. - Both get and put should run in
+O(1) average time.
+
+Common design: 1. HashMap: key -> node, for O(1) average lookup. 2.
+Doubly linked list: maintain usage order. 3. Most recently used node
+near the head. 4. Least recently used node near the tail. 5. On get:
+move node to the front. 6. On put: update/move existing node, or insert
+at front. 7. If over capacity: remove node before tail and delete its
+map entry.
+
+Why doubly linked list? Given a node reference, it can be removed and
+reinserted in O(1), because both prev and next references are available.
+
+This is a very useful SDE-1 design question because it combines a
+HashMap and a doubly linked list.
+
+============================================================ 32. HOW TO
+RECOGNIZE THE RIGHT PATTERN
+============================================================
+
+Problem clue Likely pattern Find middle Slow and fast pointers Detect a
+loop/cycle Slow and fast pointers Find cycle starting node Floyd’s
+algorithm Reverse node order Three-pointer reversal Remove nth from end
+Two pointers + dummy Merge sorted lists Dummy + tail Remove head safely
+Dummy node Check palindrome Middle + reverse second half Find shared
+node Two-pointer switching Rearrange nodes Pointer rewiring Need O(1)
+lookup and recency order HashMap + doubly linked list Sort linked list
+Merge sort Reverse fixed-size groups Group reversal + pointer rewiring
+
+============================================================ 33. HOW TO
+EXPLAIN A LINKED-LIST SOLUTION IN AN INTERVIEW
+============================================================
+
+Use this sequence:
+
+1.  Clarify the input: Is the list empty? Can values repeat? Is the list
+    sorted? Is n valid? Should the original list be modified?
+
+2.  Explain the brute-force approach: State the straightforward method
+    and its complexity.
+
+3.  Explain the optimized approach: Name the pattern: two pointers,
+    dummy node, reversal, hashing, etc.
+
+4.  Walk through an example: Draw the nodes and show how pointers move.
+
+5.  Write code: Use clear names such as prev, current, next, slow, fast,
+    dummy, tail.
+
+6.  Test edge cases: Empty, one node, two nodes, head deletion, even/odd
+    length.
+
+7.  State complexity: Explain both time and auxiliary space. Mention
+    recursion stack if applicable.
+
+Example explanation for reversing a list: “I use three pointers:
+previous, current, and next. I first save the next node so that I do not
+lose the remaining list. Then I reverse the current node’s link to point
+to previous. Finally, I move both pointers forward. I repeat until
+current becomes null. The previous pointer is the new head. This takes
+O(n) time and O(1) extra space.”
+
+============================================================ 34. QUICK
+REVISION: POINTER RULES
+============================================================
+
+ITERATIVE REVERSAL: next = current.next current.next = prev prev =
+current current = next
+
+SLOW / FAST: slow = slow.next fast = fast.next.next
+
+DUMMY NODE: dummy.next = head return dummy.next
+
+SKIP A NODE: current.next = current.next.next
+
+APPEND TO RESULT: tail.next = selectedNode tail = tail.next
+
+CYCLE: if (slow == fast) cycle exists
+
+INTERSECTION: Compare references: if (a == b)
+
+============================================================ 35. 7-DAY
+LINKED LIST STUDY PLAN
+============================================================
+
+DAY 1: Fundamentals - Understand node structure and types. - Implement
+traversal, search, insertion, deletion. - Solve Design Linked List.
+
+DAY 2: Basic pointer problems - Reverse Linked List. - Middle of Linked
+List. - Remove Linked List Elements. - Remove Duplicates from Sorted
+List.
+
+DAY 3: Fast and slow pointers - Linked List Cycle. - Linked List Cycle
+II. - Palindrome Linked List.
+
+DAY 4: Dummy node and merging - Merge Two Sorted Lists. - Remove Nth
+Node From End. - Add Two Numbers. - Intersection of Two Linked Lists.
+
+DAY 5: Reordering - Swap Nodes in Pairs. - Odd Even Linked List. -
+Rotate List. - Reorder List.
+
+DAY 6: Advanced - Reverse Linked List II. - Reverse Nodes in k-Group. -
+Sort List. - Merge k Sorted Lists.
+
+DAY 7: Design and revision - LRU Cache. - Copy List with Random
+Pointer. - Re-solve problems without looking at notes. - Explain each
+solution aloud with complexity.
+
+Study advice: Do not just read solutions. First attempt each problem
+independently. If stuck, identify the pattern, take a small hint, and
+retry. Re-solve important problems after 2-3 days and again after a
+week.
+
+============================================================ 36. FINAL
+PRODUCT-COMPANY CHECKLIST
+============================================================
+
+You are interview-ready on Linked Lists when you can:
+
+[ ] Explain arrays vs linked lists and their trade-offs. [ ] Implement a
+singly linked list from scratch in Java. [ ] Explain singly, doubly, and
+circular linked lists. [ ] Insert and delete at head, tail, and a given
+position. [ ] Reverse a list iteratively without losing nodes. [ ]
+Reverse a list recursively and state stack complexity. [ ] Find the
+middle using slow and fast pointers. [ ] Detect a cycle and find its
+starting node. [ ] Remove the nth node from the end. [ ] Merge two
+sorted linked lists. [ ] Check whether a list is a palindrome. [ ] Find
+the intersection node by reference. [ ] Add two numbers represented by
+lists. [ ] Reorder a list and swap pairs. [ ] Explain dummy nodes and
+when to use them. [ ] Solve group reversal and list sorting. [ ] Design
+an LRU cache using HashMap + doubly linked list. [ ] Test empty,
+single-node, and boundary cases. [ ] State time and space complexity
+accurately. [ ] Explain your approach clearly before coding.
+
+FINAL INTERVIEW ADVICE
+
+For SDE-1 interviews, prioritize mastery over memorizing many solutions.
+The highest-value linked-list skills are: 1. Pointer manipulation and
+safe reversal. 2. Slow and fast pointer technique. 3. Dummy-node
+technique. 4. Merging and splitting lists. 5. Recognizing when node
+identity matters. 6. Explaining complexity and edge cases.
+
+If you can solve the fundamental and medium problems above
+independently, then move to the advanced problems. Practice writing Java
+code on a blank editor without relying on autocomplete.
