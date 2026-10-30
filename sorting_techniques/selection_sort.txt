@@ -1,0 +1,17 @@
+selection sort
+--->In selection sort we will keep the minimum element to the beginning of the array 
+--->here we will sort based on the current minimum and the current element in that way we will do the selection sort
+
+selection sort code
+for(int i=0;i<n;i++){
+  int minIndex = i;
+for(int j=i+1;j<n;j++){
+  if (arr[j] < arr[minIndex]) {
+        minIndex = j;
+   }
+ }
+  int temp = arr[i];
+  arr[i] = arr[minIndex];
+  arr[minIndex] = temp;
+  }
+--->this is the selection sort code
