@@ -1,0 +1,36 @@
+Bubble sort
+In bubble sort the comparision is done by comparing the adjacent elements and for each pass the largest element will get settled at the end of the array.
+the steps for the bubble sort is 
+--->we will be having 2 loops where 1 loop i will control the next loop j 
+--->the 2nd loop j will control until the n-1-i of the loop
+--->And then finally the temp variable will swap the elements 
+
+
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+
+        int[] arr = {5, 3, 8, 2, 1};
+
+        int n = arr.length;
+
+        for (int i = 0; i < n - 1; i++) {
+
+            for (int j = 0; j < n - 1 - i; j++) {
+
+                if (arr[j] > arr[j + 1]) {
+
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+
+        System.out.println(Arrays.toString(arr));
+    }
+}
+
+tc - O(n^2)
+sc - O(1)
